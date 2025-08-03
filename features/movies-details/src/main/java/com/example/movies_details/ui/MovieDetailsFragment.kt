@@ -1,0 +1,236 @@
+package com.example.movies_details.ui
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarHalf
+import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.example.movies_details.data.MovieActorsModel
+import com.example.movies_details.data.MovieDetailsModel
+import com.example.state.State
+import com.google.accompanist.flowlayout.FlowRow
+import kotlin.math.floor
+
+
+@Composable
+fun MovieDetailsScreen(
+    viewModel: MovieDetailsViewModel
+) {
+
+    val state by viewModel.movieDetailsValue.collectAsState()
+    val actorsState by viewModel.movieDetailsActors.collectAsState()
+
+    when (state) {
+        is State.Success -> {
+            val movie = (state as State.Success<MovieDetailsModel>).data
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = movie.title ?: "No Title",
+                    style = MaterialTheme.typography.headlineMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                )
+                AsyncImage(
+                    model = movie.fullbackDropUrl,
+                    contentDescription = movie.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = movie.overview ?: "No overview",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                Row {
+                    RatingStars(rating = movie.rating ?: 0f)
+
+                    GenreTags(genres = (movie.genres ?: emptyList()) as List<String>)
+                }
+                if (actorsState is State.Success) {
+                    val actors = (actorsState as State.Success<List<MovieActorsModel>>).data
+                        .filter { actor -> !actor.profilePath.isNullOrBlank() } //delete actors with null ImgPath.
+                        .distinctBy { actor -> actor.id } //remove dublicates
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Actors",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    ActorList(actors = actors)
+                }
+            }
+        }
+
+        is State.Failure -> {
+            val error = (state as State.Failure).message
+            Text("Ошибка загрузки: ${error.localizedMessage ?: error.toString()}")
+        }
+
+        State.Empty -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        null -> {}
+    }
+}
+
+@Composable
+fun RatingStars(rating: Float) {
+    val normalized = rating.coerceIn(0f, 5f)
+    val fullStars = floor(normalized).toInt()
+    val hasHalfStar = ((normalized * 10).toInt() % 10) in 3..7
+    val emptyStars = 5 - fullStars - if (hasHalfStar) 1 else 0
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        repeat(fullStars) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "Full Star",
+                tint = Color(0xFFFFC107),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+
+        if (hasHalfStar) {
+            Icon(
+                imageVector = Icons.Default.StarHalf,
+                contentDescription = "Half Star",
+                tint = Color(0xFFFFC107),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+
+        repeat(emptyStars) {
+            Icon(
+                imageVector = Icons.Outlined.StarBorder,
+                contentDescription = "Empty Star",
+                tint = Color(0xFFFFC107),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun GenreTags(genres: List<String>) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        mainAxisSpacing = 4.dp,
+        crossAxisSpacing = 5.dp
+    ) {
+        genres.forEach { genre ->
+            GenreChip(text = genre)
+        }
+    }
+}
+
+@Composable
+fun GenreChip(text: String) {
+    Box(
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .background(
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 3.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+fun ActorList(actors: List<MovieActorsModel>) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(actors) { actor ->
+            ActorItem(actor)
+        }
+    }
+}
+
+@Composable
+fun ActorItem(actor: MovieActorsModel) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(100.dp)
+    ) {
+        Text(
+            text = actor.name ?: "No name",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 4.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Image(
+            painter = rememberAsyncImagePainter(actor.fullProfilePath),
+            contentDescription = actor.name,
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
