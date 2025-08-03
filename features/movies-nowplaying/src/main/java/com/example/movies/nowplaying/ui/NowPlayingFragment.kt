@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,8 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -22,12 +25,15 @@ import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,17 +43,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.movies.nowplaying.data.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlin.math.floor
 
 
 @Composable
 fun NowPlayingMoviesList(viewModel: NowPlayingViewModel, navController: NavController) {
     val state by viewModel.nowPlayingMoviesValue.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.layoutInfo }
+            .map { layoutInfo ->
+                val totalitems = layoutInfo.totalItemsCount
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                lastVisibleItem >= totalitems - 3
+            }
+            .distinctUntilChanged()
+            .collect { shouldLoadNextPage ->
+                if (shouldLoadNextPage && !isLoading && !viewModel.isLastPage) {
+                    viewModel.loadNowPlayingMovies()
+                }
+            }
+    }
     LazyVerticalGrid(
+        state = gridState,
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -59,25 +83,50 @@ fun NowPlayingMoviesList(viewModel: NowPlayingViewModel, navController: NavContr
                     (state as com.example.state.State.Success<List<MovieModel>?>).data.orEmpty()
                 items(items = movies) { movie ->
                     MovieItem(movie, onClick = {
-                        Log.d("NavMovieId",movie.id.toString())
+                        Log.d("NavMovieId", movie.id.toString())
                         navController.navigate(movieDetailsRoute(movie.id ?: 0))
                     })
                 }
+                if (isLoading) {
+                    item(span = { GridItemSpan(2) }) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                }
             }
 
+
             is com.example.state.State.Failure -> {
-                item {
+                item(span = { GridItemSpan(2) }) {
                     Text(text = "Ошибка: ${(state as com.example.state.State.Failure).message}")
                 }
             }
 
-            com.example.state.State.Empty -> {}
+            com.example.state.State.Empty -> {
+                item(span = { GridItemSpan(2) }) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: MovieModel,onClick:()->Unit) {
+fun MovieItem(movie: MovieModel, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .clickable(onClick = onClick)

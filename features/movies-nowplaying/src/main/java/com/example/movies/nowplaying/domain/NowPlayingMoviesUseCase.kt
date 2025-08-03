@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class NowPlayingMoviesUseCase @Inject constructor (private val repository: NowPlayingRepository) {
-    fun execute(): Flow<List<MovieModel>?> = flow {
-        emit(repository.getNowPlayingMovies())
+    fun execute(page:Int): Flow<List<MovieModel>?> = flow {
+        emit(repository.getNowPlayingMovies(page))
     }.flowOn(Dispatchers.IO)
 }

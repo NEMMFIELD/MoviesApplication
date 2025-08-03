@@ -21,6 +21,7 @@ class NowPlayingViewModel @Inject constructor(private val nowPlayingMoviesUseCas
     ViewModel() {
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         _nowPlayingMoviesValue.update { State.Failure(throwable) }
+        _isLoading.value = false
     }
 
     private val _nowPlayingMoviesValue: MutableStateFlow<State<List<MovieModel>?>> =
@@ -34,21 +35,39 @@ class NowPlayingViewModel @Inject constructor(private val nowPlayingMoviesUseCas
                 started = SharingStarted.WhileSubscribed(5000L),
                 initialValue = State.Empty
             )
+    private var currentPage = 1
+     var isLastPage = false
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+    private val loadedNowPlayingMovies = mutableListOf<MovieModel>()
 
-    private fun loadNowPlayingMovies() {
+     fun loadNowPlayingMovies() {
+        if (_isLoading.value || isLastPage) return
+        _isLoading.value = true
+
         viewModelScope.launch(coroutineExceptionHandler) {
-            nowPlayingMoviesUseCase.execute().collect { nowPlayingMovies ->
-                _nowPlayingMoviesValue.update { State.Success(nowPlayingMovies) }
+            val newNowPlayingMovies = nowPlayingMoviesUseCase.execute(currentPage)
+            newNowPlayingMovies.collect { movies ->
+                if (movies.isNullOrEmpty()) {
+                    isLastPage = true
+                } else {
+                    loadedNowPlayingMovies.addAll(movies)
+                    _nowPlayingMoviesValue.value = State.Success(loadedNowPlayingMovies.toList())
+                    currentPage++
+                }
             }
+            _isLoading.value = false
+
         }
     }
 
     override fun onCleared() {
         super.onCleared()
+        loadedNowPlayingMovies.clear()
     }
 }
 
-class NowPlayingViewModelFactory @Inject constructor (
+class NowPlayingViewModelFactory @Inject constructor(
     private val useCase: NowPlayingMoviesUseCase
 ) : ViewModelProvider.Factory {
 
