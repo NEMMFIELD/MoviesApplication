@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movies_details"
+    namespace = "com.example.movies.actorfilms"
     compileSdk = 36
 
     defaultConfig {
@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+
     implementation(libs.google.accompanist.flowlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -70,5 +71,4 @@ dependencies {
     implementation(project(":core:core-di"))
     implementation(project(":core:core-ui"))
     implementation(project(":core:core-navigation"))
-    implementation(project(":features:movies-actorfilms"))
 }

@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/core/movies-api" />
             <option value="$PROJECT_DIR$/core/state" />
             <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/movies-actorfilms" />
             <option value="$PROJECT_DIR$/features/movies-details" />
             <option value="$PROJECT_DIR$/features/movies-nowplaying" />
           </set>

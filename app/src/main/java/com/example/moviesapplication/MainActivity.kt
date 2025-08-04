@@ -20,12 +20,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.core_ui.MoviesTheme
+import com.example.movies.actorfilms.ui.ActorMovieCreditsScreen
+import com.example.movies.actorfilms.ui.ActorMovieCreditsViewModel
+import com.example.movies.actorfilms.ui.ActorMovieCreditsViewModelFactory
 import com.example.movies.nowplaying.ui.NowPlayingMoviesList
 import com.example.movies.nowplaying.ui.NowPlayingViewModel
 import com.example.movies.nowplaying.ui.NowPlayingViewModelFactory
+import com.example.movies_details.navigation.ACTOR_ID_ARG
+import com.example.movies_details.navigation.ACTOR_MOVIE_CREDITS_ROUTE
 import com.example.movies_details.navigation.MOVIE_DETAILS_ROUTE
 import com.example.movies_details.navigation.MOVIE_ID_ARG
 import com.example.movies_details.navigation.NOW_PLAYING_ROUTE
+import com.example.movies_details.navigation.actorMovieCreditsRoute
+import com.example.movies_details.navigation.movieDetailsRoute
 import com.example.movies_details.ui.MovieDetailsScreen
 import com.example.movies_details.ui.MovieDetailsViewModel
 import com.example.movies_details.ui.MovieDetailsViewModelFactoryImpl
@@ -39,6 +46,11 @@ class MainActivity : ComponentActivity() {
     lateinit var nowPlayingViewModelFactory: NowPlayingViewModelFactory
 
     private lateinit var nowPlayingViewModel: NowPlayingViewModel
+
+    @Inject
+    lateinit var actorMovieCreditsViewModelFactory: ActorMovieCreditsViewModelFactory
+
+    private lateinit var actorMovieCreditsViewModel: ActorMovieCreditsViewModel
 
     @Inject
     lateinit var movieDetailsViewModelFactory: MovieDetailsViewModelFactoryImpl
@@ -58,22 +70,23 @@ class MainActivity : ComponentActivity() {
         nowPlayingViewModel =
             ViewModelProvider(this, nowPlayingViewModelFactory)[NowPlayingViewModel::class.java]
 
+        actorMovieCreditsViewModel = ViewModelProvider(
+            this, actorMovieCreditsViewModelFactory
+        )[ActorMovieCreditsViewModel::class.java]
+
 
         setContent {
             MoviesTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
                     NavHost(
-                        navController = navController,
-                        startDestination = NOW_PLAYING_ROUTE
+                        navController = navController, startDestination = NOW_PLAYING_ROUTE
                     ) {
                         composable(NOW_PLAYING_ROUTE) {
                             NowPlayingMoviesList(
-                                navController = navController,
-                                viewModel = nowPlayingViewModel
+                                navController = navController, viewModel = nowPlayingViewModel
                             )
                         }
                         composable(
@@ -91,7 +104,30 @@ class MainActivity : ComponentActivity() {
                                 viewModel.loadMovieActors(movieId)
                             }
 
-                            MovieDetailsScreen(viewModel = viewModel)
+                            MovieDetailsScreen(
+                                viewModel = viewModel,
+                                navController
+                            )
+                        }
+                        composable(
+                            route = "$ACTOR_MOVIE_CREDITS_ROUTE/{$ACTOR_ID_ARG}",
+                            arguments = listOf(navArgument(ACTOR_ID_ARG) {
+                                type = NavType.IntType
+                            })
+                        ) { backStackEntry ->
+                            val actorId = backStackEntry.arguments?.getInt(ACTOR_ID_ARG) ?: 0
+                            val viewModel = ViewModelProvider(
+                                backStackEntry,
+                                actorMovieCreditsViewModelFactory
+                            )[ActorMovieCreditsViewModel::class.java]
+                            LaunchedEffect(actorId) { viewModel.loadActorMovieCredits(actorId) }
+
+                            ActorMovieCreditsScreen(
+                                viewModel = viewModel,
+                                onActorClick = { actorId ->
+                                    navController.navigate(actorMovieCreditsRoute(actorId))
+                                }
+                            )
                         }
                     }
                 }

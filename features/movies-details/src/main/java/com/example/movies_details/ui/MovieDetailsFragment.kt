@@ -2,6 +2,7 @@ package com.example.movies_details.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,10 +40,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import com.example.movies_details.data.MovieActorsModel
 import com.example.movies_details.data.MovieDetailsModel
+import com.example.movies_details.navigation.actorMovieCreditsRoute
 import com.example.state.State
 import com.google.accompanist.flowlayout.FlowRow
 import kotlin.math.floor
@@ -50,7 +53,8 @@ import kotlin.math.floor
 
 @Composable
 fun MovieDetailsScreen(
-    viewModel: MovieDetailsViewModel
+    viewModel: MovieDetailsViewModel,
+    navController: NavController
 ) {
 
     val state by viewModel.movieDetailsValue.collectAsState()
@@ -106,7 +110,7 @@ fun MovieDetailsScreen(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    ActorList(actors = actors)
+                    ActorList(actors = actors, navController)
                 }
             }
         }
@@ -199,22 +203,29 @@ fun GenreChip(text: String) {
 }
 
 @Composable
-fun ActorList(actors: List<MovieActorsModel>) {
+fun ActorList(actors: List<MovieActorsModel>, navController: NavController) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(actors) { actor ->
-            ActorItem(actor)
+            ActorItem(
+                actor,
+                onClick = { navController.navigate(actorMovieCreditsRoute(actor.id ?: 0)) })
         }
     }
 }
 
 @Composable
-fun ActorItem(actor: MovieActorsModel) {
+fun ActorItem(
+    actor: MovieActorsModel,
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(100.dp)
+        modifier = Modifier
+            .width(100.dp)
+            .clickable { onClick() }
     ) {
         Text(
             text = actor.name ?: "No name",

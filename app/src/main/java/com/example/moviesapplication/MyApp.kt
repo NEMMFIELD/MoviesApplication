@@ -1,6 +1,8 @@
 package com.example.moviesapplication
 
 import android.app.Application
+import com.example.movies.actorfilms.di.ActorMovieCreditsComponent
+import com.example.movies.actorfilms.di.ActorMovieCreditsComponentProvider
 import com.example.movies.nowplaying.di.NowPlayingComponentProvider
 import com.example.movies.nowplaying.di.NowPlayingComponent
 import dagger.android.AndroidInjector
@@ -9,7 +11,7 @@ import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
 
-class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector{
+class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector, ActorMovieCreditsComponentProvider{
 
     lateinit var appComponent: AppComponent
 
@@ -29,6 +31,10 @@ class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector{
 
     override fun androidInjector(): AndroidInjector<in Any>? {
         return androidInjector
+    }
+
+    override fun ActorMovieCreditsComponent(): ActorMovieCreditsComponent {
+       return appComponent.actorMovieCreditsComponent().create()
     }
 
 }

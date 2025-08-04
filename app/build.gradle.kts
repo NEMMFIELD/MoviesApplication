@@ -71,7 +71,9 @@ dependencies {
     implementation(project(":core:movies-api"))
     implementation(project(":features:movies-nowplaying"))
     implementation(project(":features:movies-details"))
+    implementation(project(":features:movies-actorfilms"))
     implementation(project(":core:core-di"))
     implementation(project(":core:core-ui"))
     implementation(project(":core:core-navigation"))
+
 }
