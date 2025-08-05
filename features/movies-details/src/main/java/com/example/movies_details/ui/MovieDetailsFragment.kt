@@ -101,7 +101,7 @@ fun MovieDetailsScreen(
                     GenreTags(genres = (movie.genres ?: emptyList()) as List<String>)
                 }
                 if (actorsState is State.Success) {
-                    val actors = (actorsState as State.Success<List<MovieActorsModel>?>).data
+                    val actors = (actorsState as State.Success<List<MovieActorsModel>>).data
                         .filter { actor -> !actor.profilePath.isNullOrBlank() } //delete actors with null ImgPath.
                         .distinctBy { actor -> actor.id } //remove dublicates
                     Spacer(modifier = Modifier.height(16.dp))
