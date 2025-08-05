@@ -32,7 +32,6 @@ import com.example.movies_details.navigation.MOVIE_DETAILS_ROUTE
 import com.example.movies_details.navigation.MOVIE_ID_ARG
 import com.example.movies_details.navigation.NOW_PLAYING_ROUTE
 import com.example.movies_details.navigation.actorMovieCreditsRoute
-import com.example.movies_details.navigation.movieDetailsRoute
 import com.example.movies_details.ui.MovieDetailsScreen
 import com.example.movies_details.ui.MovieDetailsViewModel
 import com.example.movies_details.ui.MovieDetailsViewModelFactoryImpl
@@ -126,7 +125,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = viewModel,
                                 onActorClick = { actorId ->
                                     navController.navigate(actorMovieCreditsRoute(actorId))
-                                }
+                                }, navController
                             )
                         }
                     }

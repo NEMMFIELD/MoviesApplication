@@ -101,14 +101,14 @@ fun MovieDetailsScreen(
                     GenreTags(genres = (movie.genres ?: emptyList()) as List<String>)
                 }
                 if (actorsState is State.Success) {
-                    val actors = (actorsState as State.Success<List<MovieActorsModel>>).data
+                    val actors = (actorsState as State.Success<List<MovieActorsModel>?>).data
                         .filter { actor -> !actor.profilePath.isNullOrBlank() } //delete actors with null ImgPath.
                         .distinctBy { actor -> actor.id } //remove dublicates
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Actors",
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp, start = 3.dp)
                     )
                     ActorList(actors = actors, navController)
                 }
@@ -117,7 +117,7 @@ fun MovieDetailsScreen(
 
         is State.Failure -> {
             val error = (state as State.Failure).message
-            Text("Ошибка загрузки: ${error.localizedMessage ?: error.toString()}")
+            Text("Error loading: ${error.localizedMessage ?: error.toString()}")
         }
 
         State.Empty -> {
