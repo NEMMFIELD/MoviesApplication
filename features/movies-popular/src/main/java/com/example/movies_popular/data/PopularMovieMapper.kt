@@ -1,9 +1,9 @@
-package com.example.movies.nowplaying.data
+package com.example.movies_popular.data
 
 import com.example.core_model.MovieModel
 import com.example.movies.api.model.ResultsItem
 
-object MovieMapper {
+object PopularMovieMapper {
     fun mapDtoToModel(dto: ResultsItem?): MovieModel {
         val safeVoteAverage = dto?.voteAverage
 

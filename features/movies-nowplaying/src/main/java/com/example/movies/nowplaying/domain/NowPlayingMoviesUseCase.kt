@@ -1,6 +1,6 @@
 package com.example.movies.nowplaying.domain
 
-import com.example.movies.nowplaying.data.MovieModel
+import com.example.core_model.MovieModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

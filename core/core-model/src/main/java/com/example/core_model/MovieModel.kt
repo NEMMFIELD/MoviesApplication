@@ -1,4 +1,4 @@
-package com.example.movies.nowplaying.data
+package com.example.core_model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

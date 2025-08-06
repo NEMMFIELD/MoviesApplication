@@ -7,6 +7,7 @@
       <module name="Movies_Application.movies-actorfilms" target="21" />
       <module name="Movies_Application.movies-details" target="21" />
       <module name="Movies_Application.movies-nowplaying" target="21" />
+      <module name="Movies_Application.movies-popular" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>

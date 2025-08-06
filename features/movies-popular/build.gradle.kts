@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movies.nowplaying"
+    namespace = "com.example.movies_popular"
     compileSdk = 36
 
     defaultConfig {
