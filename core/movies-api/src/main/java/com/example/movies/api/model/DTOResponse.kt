@@ -2,7 +2,7 @@ package com.example.movies.api.model
 
 import com.google.gson.annotations.SerializedName
 
-data class NowPlayingResponse(
+data class DTOResponse(
 
 	@field:SerializedName("dates")
 	val dates: Dates? = null,

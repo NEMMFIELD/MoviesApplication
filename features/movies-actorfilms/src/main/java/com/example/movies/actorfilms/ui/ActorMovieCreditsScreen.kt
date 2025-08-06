@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -77,8 +76,12 @@ fun ErrorScreen(message: String) {
 
 @Composable
 fun EmptyScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "No movies found", style = MaterialTheme.typography.bodyLarge)
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
 
@@ -98,7 +101,7 @@ fun MoviePosterGrid(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(movies) { movie ->
-            MoviePosterItem(movie = movie, onClick = { onMovieClick(movie.id ?: 0)})
+            MoviePosterItem(movie = movie, onClick = { onMovieClick(movie.id ?: 0) })
         }
     }
 }

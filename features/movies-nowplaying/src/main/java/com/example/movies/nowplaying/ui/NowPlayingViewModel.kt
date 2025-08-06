@@ -8,10 +8,7 @@ import com.example.movies.nowplaying.domain.NowPlayingMoviesUseCase
 import com.example.state.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,20 +26,21 @@ class NowPlayingViewModel @Inject constructor(private val nowPlayingMoviesUseCas
 
     val nowPlayingMoviesValue: StateFlow<State<List<MovieModel>?>>
         get() = _nowPlayingMoviesValue
-            .onStart { loadNowPlayingMovies() }
-            .stateIn(
-                viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = State.Empty
-            )
+
     private var currentPage = 1
-     var isLastPage = false
+    var isLastPage = false
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     private val loadedNowPlayingMovies = mutableListOf<MovieModel>()
 
-     fun loadNowPlayingMovies() {
+    init {
+        loadedNowPlayingMovies
+    }
+
+    fun loadNowPlayingMovies() {
         if (_isLoading.value || isLastPage) return
+        if (_nowPlayingMoviesValue.value is State.Success) return
+
         _isLoading.value = true
 
         viewModelScope.launch(coroutineExceptionHandler) {
@@ -59,11 +57,6 @@ class NowPlayingViewModel @Inject constructor(private val nowPlayingMoviesUseCas
             _isLoading.value = false
 
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        loadedNowPlayingMovies.clear()
     }
 }
 

@@ -1,6 +1,5 @@
 package com.example.movies.nowplaying.data
 
-import com.example.movies.api.model.NowPlayingResponse
 import com.example.movies.api.model.ResultsItem
 
 object MovieMapper {

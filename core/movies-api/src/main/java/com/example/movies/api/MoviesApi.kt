@@ -3,7 +3,7 @@ package com.example.movies.api
 import com.example.movies.api.model.ActorMovieCreditsResponse
 import com.example.movies.api.model.MovieActorsResponse
 import com.example.movies.api.model.MovieDetailsResponse
-import com.example.movies.api.model.NowPlayingResponse
+import com.example.movies.api.model.DTOResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -14,7 +14,14 @@ interface MoviesApi {
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int
-    ): NowPlayingResponse
+    ): DTOResponse
+
+    @GET("movie/popular")
+    suspend fun getPopularMovies(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int
+    ): DTOResponse
 
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(

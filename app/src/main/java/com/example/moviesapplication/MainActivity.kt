@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -217,7 +218,7 @@ fun BottomNavBar(navController: NavController) {
                     }
                 },
                 icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) }
+                label = { Text(item.label, color = if (currentRoute == item.route) Color.Cyan else Color.Gray) }
             )
         }
     }
