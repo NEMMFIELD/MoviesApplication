@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,37 +39,46 @@ fun ActorMovieCreditsScreen(
     navController: NavController
 ) {
     val state by viewModel.actorMovieCreditsValue.collectAsState()
-    when (state) {
+
+    when (val result = state) {
+
         is State.Success -> {
-            val movies = (state as State.Success<List<ActorMovieCreditsModel>?>).data
-                ?.filter { movie -> !movie.posterPath.isNullOrBlank() }
-                ?.distinctBy { movie -> movie.id }
-            MoviePosterGrid(
-                movies = movies ?: emptyList(),
-                onMovieClick = { movieId ->
-                    navController.navigate(
-                        movieDetailsRoute(movieId)
-                    )
-                })
-        }
+            val movies = result.data
+                .orEmpty()
+                .filter { !it.posterPath.isNullOrBlank() && it.id != null }
+                .distinctBy { it.id }
 
-        is State.Failure -> {
-            val error = (state as State.Failure).message.message ?: "Unknown error"
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Error: $error", color = Color.Red)
+            if (movies.isEmpty()) {
+                EmptyScreen()
+            } else {
+                MoviePosterGrid(
+                    movies = movies,
+                    onMovieClick = { movieId ->
+                        navController.navigate(movieDetailsRoute(movieId))
+                    }
+                )
             }
         }
 
-        State.Empty -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+        is State.Failure -> ErrorScreen(message = result.message.message ?: "Unknown error")
+
+        is State.Empty -> EmptyScreen()
 
         null -> {}
+    }
+}
+
+@Composable
+fun ErrorScreen(message: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(text = "Error: $message", color = Color.Red)
+    }
+}
+
+@Composable
+fun EmptyScreen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(text = "No movies found", style = MaterialTheme.typography.bodyLarge)
     }
 }
 

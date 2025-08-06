@@ -25,6 +25,8 @@ kapt = "2.2.0"
 dagger = "2.57"
 appcompat = "1.7.1"
 material = "1.12.0"
+uiAndroid = "1.8.3"
+transportApi = "4.0.0"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -61,6 +63,8 @@ dagger-android-support = { group = "com.google.dagger", name = "dagger-android-s
 dagger-android-processor = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
+transport-api = { group = "com.google.android.datatransport", name = "transport-api", version.ref = "transportApi" }
 
 
 [plugins]

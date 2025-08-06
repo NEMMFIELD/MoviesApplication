@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
+    implementation(libs.transport.api)
     kapt(libs.dagger.compiler)
     implementation(libs.dagger.android)
     implementation(libs.dagger.android.support)

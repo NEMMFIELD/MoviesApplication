@@ -22,13 +22,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,99 +42,151 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.request.error
+import coil3.request.placeholder
+import com.example.movies_details.R
 import com.example.movies_details.data.MovieActorsModel
-import com.example.movies_details.data.MovieDetailsModel
 import com.example.movies_details.navigation.actorMovieCreditsRoute
 import com.example.state.State
 import com.google.accompanist.flowlayout.FlowRow
 import kotlin.math.floor
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailsScreen(
     viewModel: MovieDetailsViewModel,
     navController: NavController
 ) {
-
     val state by viewModel.movieDetailsValue.collectAsState()
     val actorsState by viewModel.movieDetailsActors.collectAsState()
 
-    when (state) {
-        is State.Success -> {
-            val movie = (state as State.Success<MovieDetailsModel>).data
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Text(
-                    text = movie.title ?: "No Title",
-                    style = MaterialTheme.typography.headlineMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                )
-                AsyncImage(
-                    model = movie.fullbackDropUrl,
-                    contentDescription = movie.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = movie.overview ?: "No overview",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                Row {
-                    RatingStars(rating = movie.rating ?: 0f)
-
-                    GenreTags(genres = (movie.genres ?: emptyList()) as List<String>)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Movie Details")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
                 }
-                if (actorsState is State.Success) {
-                    val actors = (actorsState as State.Success<List<MovieActorsModel>>).data
-                        .filter { actor -> !actor.profilePath.isNullOrBlank() } //delete actors with null ImgPath.
-                        .distinctBy { actor -> actor.id } //remove dublicates
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Actors",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp, start = 3.dp)
-                    )
-                    ActorList(actors = actors, navController)
+            )
+        }
+    ) { innerPadding ->
+        when (val movieState = state) {
+            is State.Success -> {
+                val movie = movieState.data
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp
+                        )
+                        .padding(top = innerPadding.calculateTopPadding() / 10)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    MovieTitle(movie.title)
+                    MovieBackdrop(movie.fullbackDropUrl, movie.title)
+                    MovieOverview(movie.overview)
+                    MovieRatingAndGenres(movie.rating, movie.genres as List<String>?)
+
+                    if (actorsState is State.Success) {
+                        val actors = (actorsState as State.Success<List<MovieActorsModel>>).data
+                            .filter { !it.profilePath.isNullOrBlank() }
+                            .distinctBy { it.id }
+
+                        MovieActorsSection(actors, navController)
+                    }
+                }
+            }
+
+            is State.Failure -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Error loading: ${movieState.message.localizedMessage ?: "Unknown error"}")
+                }
+            }
+
+            null, State.Empty -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
+    }
+}
 
-        is State.Failure -> {
-            val error = (state as State.Failure).message
-            Text("Error loading: ${error.localizedMessage ?: error.toString()}")
-        }
+@Composable
+fun MovieTitle(title: String?) {
+    Text(
+        text = title ?: "No Title",
+        style = MaterialTheme.typography.headlineMedium,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+    )
+}
 
-        State.Empty -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+@Composable
+fun MovieBackdrop(url: String?, contentDesc: String?) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(url)
+            .crossfade(true)
+            .build(),
+        contentDescription = contentDesc,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)
+            .clip(RoundedCornerShape(12.dp))
+    )
+}
 
-        null -> {}
+@Composable
+fun MovieOverview(overview: String?) {
+    Text(
+        text = overview ?: "No overview",
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(bottom = 12.dp)
+    )
+}
+
+@Composable
+fun MovieRatingAndGenres(rating: Float?, genres: List<String>?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RatingStars(rating = rating ?: 0f)
+        Spacer(modifier = Modifier.width(12.dp))
+        GenreTags(genres.orEmpty())
     }
 }
 
@@ -149,7 +206,6 @@ fun RatingStars(rating: Float) {
                 modifier = Modifier.size(20.dp)
             )
         }
-
         if (hasHalfStar) {
             Icon(
                 imageVector = Icons.Default.StarHalf,
@@ -158,7 +214,6 @@ fun RatingStars(rating: Float) {
                 modifier = Modifier.size(20.dp)
             )
         }
-
         repeat(emptyStars) {
             Icon(
                 imageVector = Icons.Outlined.StarBorder,
@@ -177,7 +232,7 @@ fun GenreTags(genres: List<String>) {
         mainAxisSpacing = 4.dp,
         crossAxisSpacing = 5.dp
     ) {
-        genres.forEach { genre ->
+        genres.sorted().forEach { genre ->
             GenreChip(text = genre)
         }
     }
@@ -203,15 +258,23 @@ fun GenreChip(text: String) {
 }
 
 @Composable
-fun ActorList(actors: List<MovieActorsModel>, navController: NavController) {
+fun MovieActorsSection(actors: List<MovieActorsModel>, navController: NavController) {
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Text(
+        text = "Actors",
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(bottom = 8.dp, start = 3.dp)
+    )
+
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(actors) { actor ->
-            ActorItem(
-                actor,
-                onClick = { navController.navigate(actorMovieCreditsRoute(actor.id ?: 0)) })
+            ActorItem(actor = actor) {
+                navController.navigate(actorMovieCreditsRoute(actor.id ?: 0))
+            }
         }
     }
 }
@@ -235,7 +298,14 @@ fun ActorItem(
             overflow = TextOverflow.Ellipsis
         )
         Image(
-            painter = rememberAsyncImagePainter(actor.fullProfilePath),
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(actor.fullProfilePath)
+                    .placeholder(R.drawable.prof) // замени на свой ресурс
+                    .error(R.drawable.prof)
+                    .crossfade(true)
+                    .build()
+            ),
             contentDescription = actor.name,
             modifier = Modifier
                 .size(80.dp)
@@ -245,3 +315,4 @@ fun ActorItem(
         )
     }
 }
+
