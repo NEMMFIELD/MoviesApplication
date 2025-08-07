@@ -1,4 +1,4 @@
-package com.example.movies.toprated.ui
+package com.example.movies_upcoming.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -59,13 +58,14 @@ import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlin.collections.orEmpty
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.math.floor
 
 @Composable
-fun TopRatedMoviesList(topRatedViewModel: TopRatedViewModel, navController: NavController) {
-    val state by topRatedViewModel.topRatedMoviesValue.collectAsState()
-    val isLoading by topRatedViewModel.isLoading.collectAsState()
+fun UpcomingMoviesList(upcomingViewModel: UpcomingViewModel, navController: NavController) {
+    val state by upcomingViewModel.upcomingMoviesValue.collectAsState()
+    val isLoading by upcomingViewModel.isLoading.collectAsState()
     val gridState = rememberLazyGridState()
 
     LaunchedEffect(gridState) {
@@ -77,14 +77,14 @@ fun TopRatedMoviesList(topRatedViewModel: TopRatedViewModel, navController: NavC
             }
             .distinctUntilChanged()
             .collect { shouldLoadNextPage ->
-                if (shouldLoadNextPage && !isLoading && !topRatedViewModel.isLastPage) {
-                    topRatedViewModel.loadTopRatedMovies()
+                if (shouldLoadNextPage && !isLoading && !upcomingViewModel.isLastPage) {
+                    upcomingViewModel.loadPopularMovies()
                 }
             }
     }
     when (val currentState = state) {
         is com.example.state.State.Success -> {
-            TopRatedGrid(
+            UpcomingGrid(
                 movies = currentState.data.orEmpty(),
                 isLoading = isLoading,
                 onMovieClick = { movieId ->
@@ -112,7 +112,7 @@ fun TopRatedMoviesList(topRatedViewModel: TopRatedViewModel, navController: NavC
 }
 
 @Composable
-fun TopRatedGrid(
+fun UpcomingGrid(
     movies: List<MovieModel>,
     isLoading: Boolean,
     onMovieClick: (Int) -> Unit,
@@ -159,12 +159,12 @@ fun AnimatedMovieItem(movie: MovieModel, onClick: () -> Unit, modifier: Modifier
             animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
         )
     ) {
-        TopRatedMovieItem(movie = movie, onClick = onClick)
+        UpcomingMovieItem(movie = movie, onClick = onClick)
     }
 }
 
 @Composable
-fun TopRatedMovieItem(movie: MovieModel, onClick: () -> Unit) {
+fun UpcomingMovieItem(movie: MovieModel, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .clickable(onClick = onClick)
@@ -192,6 +192,13 @@ fun TopRatedMovieItem(movie: MovieModel, onClick: () -> Unit) {
                 modifier = Modifier.padding(bottom = 8.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                "Release:${formatReleaseDate(movie.releaseDate)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 10.dp)
             )
 
             AsyncImage(
@@ -246,4 +253,15 @@ fun MovieRatingStars(rating: Float) {
             )
         }
     }
+}
+
+private fun formatReleaseDate(date: String?): String {
+    return date?.let {
+        try {
+            val parsed = LocalDate.parse(it)
+            parsed.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+        } catch (e: Exception) {
+            "Unknown"
+        }
+    } ?: "Unknown"
 }

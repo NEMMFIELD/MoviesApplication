@@ -9,6 +9,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MoviesApi {
+    //Now playing movies
     @GET("movie/now_playing")
     suspend fun getNowPlayingMovies(
         @Query("api_key") apiKey: String,
@@ -16,6 +17,7 @@ interface MoviesApi {
         @Query("page") page: Int
     ): DTOResponse
 
+    //Popular movies
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("api_key") apiKey: String,
@@ -23,8 +25,17 @@ interface MoviesApi {
         @Query("page") page: Int
     ): DTOResponse
 
+    //Top rated movies
     @GET("movie/top_rated")
     suspend fun getTopRatedMovies(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int
+    ): DTOResponse
+
+    //Upcoming movies
+    @GET("movie/upcoming")
+    suspend fun getUpcomingMovies(
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int

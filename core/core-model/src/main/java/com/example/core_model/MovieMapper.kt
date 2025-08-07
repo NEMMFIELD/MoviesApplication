@@ -7,7 +7,7 @@ object MovieMapper {
         val safeVoteAverage = dto?.voteAverage
 
         val rating = when (safeVoteAverage) {
-            is Number -> safeVoteAverage.toFloat()/2F
+            is Number -> safeVoteAverage.toFloat() / 2F
             is String -> safeVoteAverage.toFloatOrNull()?.div(2F)
             else -> null
         }
@@ -15,7 +15,9 @@ object MovieMapper {
             id = dto?.id,
             title = dto?.title,
             posterPath = dto?.posterPath,
-            rating = rating)
+            rating = rating,
+            releaseDate = dto?.releaseDate
+        )
 
     }
 }

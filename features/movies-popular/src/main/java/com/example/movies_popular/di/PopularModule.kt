@@ -17,7 +17,7 @@ class PopularModule {
     }
 
     @Provides
-    fun provideNoPopularRepository(api: MoviesApi): PopularRepository {
+    fun providePopularRepository(api: MoviesApi): PopularRepository {
         return PopularRepositoryImpl(api)
     }
 }

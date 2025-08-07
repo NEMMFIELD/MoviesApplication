@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -201,7 +202,7 @@ fun PopularMovieItem(movie: MovieModel, onClick: () -> Unit) {
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             MovieRatingStars(rating = movie.rating ?: 0f)
         }
@@ -230,7 +231,7 @@ fun MovieRatingStars(rating: Float) {
                 imageVector = Icons.Default.StarHalf,
                 contentDescription = "Half star",
                 tint = Color(0xFFFFC107),
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
 

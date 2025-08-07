@@ -9,6 +9,8 @@ import com.example.movies.toprated.di.TopRatedComponent
 import com.example.movies.toprated.di.TopRatedComponentProvider
 import com.example.movies_popular.di.PopularComponent
 import com.example.movies_popular.di.PopularComponentProvider
+import com.example.movies_upcoming.di.UpcomingComponent
+import com.example.movies_upcoming.di.UpcomingComponentProvider
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 
 class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector,
-    ActorMovieCreditsComponentProvider, PopularComponentProvider, TopRatedComponentProvider {
+    ActorMovieCreditsComponentProvider, PopularComponentProvider, TopRatedComponentProvider,
+    UpcomingComponentProvider {
 
     lateinit var appComponent: AppComponent
 
@@ -48,6 +51,10 @@ class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector,
 
     override fun provideTopRatedComponent(): TopRatedComponent {
         return appComponent.topRatedComponent().create()
+    }
+
+    override fun provideUpcomingComponent(): UpcomingComponent {
+        return appComponent.upcomingComponent().create()
     }
 
 }

@@ -8,7 +8,8 @@ data class MovieModel(
     val id: Int?,
     val title: String?,
     val posterPath: String?,
-    val rating: Float?
+    val rating: Float?,
+    val releaseDate:String? = null
 ) : Parcelable {
     val fullPosterUrl: String?
         get() = posterPath?.let { "https://image.tmdb.org/t/p/w500$it" }

@@ -60,6 +60,9 @@ import com.example.movies_details.ui.MovieDetailsViewModelFactoryImpl
 import com.example.movies_popular.ui.PopularMoviesList
 import com.example.movies_popular.ui.PopularViewModel
 import com.example.movies_popular.ui.PopularViewModelFactory
+import com.example.movies_upcoming.ui.UpcomingMoviesList
+import com.example.movies_upcoming.ui.UpcomingViewModel
+import com.example.movies_upcoming.ui.UpcomingViewModelFactory
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -80,6 +83,11 @@ class MainActivity : ComponentActivity() {
     lateinit var topRatedViewModelFactory: TopRatedViewModelFactory
 
     private lateinit var topRatedViewModel: TopRatedViewModel
+
+    @Inject
+    lateinit var upcomingViewModelFactory: UpcomingViewModelFactory
+
+    private lateinit var upcomingViewModel: UpcomingViewModel
 
     @Inject
     lateinit var actorMovieCreditsViewModelFactory: ActorMovieCreditsViewModelFactory
@@ -109,6 +117,9 @@ class MainActivity : ComponentActivity() {
 
         topRatedViewModel =
             ViewModelProvider(this, topRatedViewModelFactory)[TopRatedViewModel::class.java]
+
+        upcomingViewModel =
+            ViewModelProvider(this, upcomingViewModelFactory)[UpcomingViewModel::class.java]
 
         actorMovieCreditsViewModel = ViewModelProvider(
             this, actorMovieCreditsViewModelFactory
@@ -163,7 +174,10 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(BottomNavItem.Upcoming.route) {
-                                Text("Upcoming Movies") // Replace with your Upcoming ViewModel/Screen
+                                UpcomingMoviesList(
+                                    navController = navController,
+                                    upcomingViewModel = upcomingViewModel
+                                )
                             }
 
                             composable(
