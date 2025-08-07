@@ -1,10 +1,10 @@
-package com.example.movies_popular.ui
+package com.example.movies.toprated.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.core_model.MovieModel
-import com.example.movies_popular.domain.GetPopularMoviesUseCase
+import com.example.movies.toprated.domain.GetTopRatedMoviesUseCase
 import com.example.state.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,18 +13,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class PopularViewModel @Inject constructor(private val getPopularMoviesUseCase: GetPopularMoviesUseCase):
+class TopRatedViewModel @Inject constructor(private val getTopRatedMoviesUseCase: GetTopRatedMoviesUseCase) :
     ViewModel() {
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _popularMoviesValue.update { com.example.state.State.Failure(throwable) }
+        _topRatedMoviesValue.update { com.example.state.State.Failure(throwable) }
         _isLoading.value = false
     }
 
-    private val _popularMoviesValue: MutableStateFlow<State<List<MovieModel>?>> =
+    private val _topRatedMoviesValue: MutableStateFlow<State<List<MovieModel>?>> =
         MutableStateFlow(State.Empty)
 
-    val popularMoviesValue: StateFlow<State<List<MovieModel>?>>
-        get() = _popularMoviesValue
+    val topRatedMoviesValue: StateFlow<State<List<MovieModel>?>>
+        get() = _topRatedMoviesValue
 
     private var currentPage = 1
     var isLastPage = false
@@ -33,23 +33,23 @@ class PopularViewModel @Inject constructor(private val getPopularMoviesUseCase: 
     private val loadedPopularMovies = mutableListOf<MovieModel>()
 
     init {
-        loadPopularMovies()
+        loadTopRatedMovies()
     }
 
-    fun loadPopularMovies() {
+    fun loadTopRatedMovies() {
         if (_isLoading.value || isLastPage) return
-        if (_popularMoviesValue.value is State.Success) return
+        if (_topRatedMoviesValue.value is State.Success) return
 
         _isLoading.value = true
 
         viewModelScope.launch(coroutineExceptionHandler) {
-            val newNowPlayingMovies = getPopularMoviesUseCase.execute(currentPage)
+            val newNowPlayingMovies = getTopRatedMoviesUseCase.execute(currentPage)
             newNowPlayingMovies.collect { movies ->
                 if (movies.isNullOrEmpty()) {
                     isLastPage = true
                 } else {
                     loadedPopularMovies.addAll(movies)
-                    _popularMoviesValue.value = State.Success(loadedPopularMovies.toList())
+                    _topRatedMoviesValue.value = State.Success(loadedPopularMovies.toList())
                     currentPage++
                 }
             }
@@ -59,14 +59,14 @@ class PopularViewModel @Inject constructor(private val getPopularMoviesUseCase: 
     }
 }
 
-class PopularViewModelFactory @Inject constructor(
-    private val getPopularMoviesUseCase: GetPopularMoviesUseCase
+class TopRatedViewModelFactory @Inject constructor(
+    private val getPopularMoviesUseCase: GetTopRatedMoviesUseCase
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PopularViewModel::class.java)) {
-            return PopularViewModel(getPopularMoviesUseCase) as T
+        if (modelClass.isAssignableFrom(TopRatedViewModel::class.java)) {
+            return TopRatedViewModel(getPopularMoviesUseCase) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

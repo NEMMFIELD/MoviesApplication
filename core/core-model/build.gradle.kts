@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.invoke
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -32,4 +34,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+}
+dependencies {
+    implementation(project(":core:movies-api"))
 }

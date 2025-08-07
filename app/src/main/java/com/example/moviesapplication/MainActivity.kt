@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -43,6 +42,9 @@ import com.example.movies.actorfilms.ui.ActorMovieCreditsViewModelFactory
 import com.example.movies.nowplaying.ui.NowPlayingMoviesList
 import com.example.movies.nowplaying.ui.NowPlayingViewModel
 import com.example.movies.nowplaying.ui.NowPlayingViewModelFactory
+import com.example.movies.toprated.ui.TopRatedMoviesList
+import com.example.movies.toprated.ui.TopRatedViewModel
+import com.example.movies.toprated.ui.TopRatedViewModelFactory
 import com.example.movies_details.navigation.ACTOR_ID_ARG
 import com.example.movies_details.navigation.ACTOR_MOVIE_CREDITS_ROUTE
 import com.example.movies_details.navigation.MOVIE_DETAILS_ROUTE
@@ -55,6 +57,9 @@ import com.example.movies_details.navigation.actorMovieCreditsRoute
 import com.example.movies_details.ui.MovieDetailsScreen
 import com.example.movies_details.ui.MovieDetailsViewModel
 import com.example.movies_details.ui.MovieDetailsViewModelFactoryImpl
+import com.example.movies_popular.ui.PopularMoviesList
+import com.example.movies_popular.ui.PopularViewModel
+import com.example.movies_popular.ui.PopularViewModelFactory
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -65,6 +70,16 @@ class MainActivity : ComponentActivity() {
     lateinit var nowPlayingViewModelFactory: NowPlayingViewModelFactory
 
     private lateinit var nowPlayingViewModel: NowPlayingViewModel
+
+    @Inject
+    lateinit var popularViewModelFactory: PopularViewModelFactory
+
+    private lateinit var popularViewModel: PopularViewModel
+
+    @Inject
+    lateinit var topRatedViewModelFactory: TopRatedViewModelFactory
+
+    private lateinit var topRatedViewModel: TopRatedViewModel
 
     @Inject
     lateinit var actorMovieCreditsViewModelFactory: ActorMovieCreditsViewModelFactory
@@ -88,6 +103,12 @@ class MainActivity : ComponentActivity() {
 
         nowPlayingViewModel =
             ViewModelProvider(this, nowPlayingViewModelFactory)[NowPlayingViewModel::class.java]
+
+        popularViewModel =
+            ViewModelProvider(this, popularViewModelFactory)[PopularViewModel::class.java]
+
+        topRatedViewModel =
+            ViewModelProvider(this, topRatedViewModelFactory)[TopRatedViewModel::class.java]
 
         actorMovieCreditsViewModel = ViewModelProvider(
             this, actorMovieCreditsViewModelFactory
@@ -128,11 +149,17 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(BottomNavItem.Popular.route) {
-                                Text("Popular Movies") // Replace with your Popular ViewModel/Screen
+                                PopularMoviesList(
+                                    navController = navController,
+                                    popularViewModel = popularViewModel,
+                                )
                             }
 
                             composable(BottomNavItem.TopRated.route) {
-                                Text("Top Rated Movies") // Replace with your Top Rated ViewModel/Screen
+                                TopRatedMoviesList(
+                                    navController = navController,
+                                    topRatedViewModel = topRatedViewModel
+                                )
                             }
 
                             composable(BottomNavItem.Upcoming.route) {
@@ -218,7 +245,12 @@ fun BottomNavBar(navController: NavController) {
                     }
                 },
                 icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label, color = if (currentRoute == item.route) Color.Cyan else Color.Gray) }
+                label = {
+                    Text(
+                        item.label,
+                        color = if (currentRoute == item.route) Color.Cyan else Color.Gray
+                    )
+                }
             )
         }
     }

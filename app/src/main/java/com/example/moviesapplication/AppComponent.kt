@@ -7,10 +7,14 @@ import com.example.movies.actorfilms.di.ActorMovieCreditsComponent
 import com.example.movies.actorfilms.di.ActorMovieCreditsModule
 import com.example.movies.nowplaying.di.NowPlayingComponent
 import com.example.movies.nowplaying.di.NowPlayingModule
+import com.example.movies.toprated.di.TopRatedComponent
+import com.example.movies.toprated.di.TopRatedModule
 import com.example.movies_details.di.MovieDetailsComponent
 import com.example.movies_details.di.MovieDetailsModule
 import com.example.movies_details.di.MovieDetailsPresentationModule
 import com.example.movies_details.ui.MovieDetailsViewModelFactoryImpl
+import com.example.movies_popular.di.PopularComponent
+import com.example.movies_popular.di.PopularModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
@@ -25,6 +29,8 @@ import javax.inject.Singleton
         MovieDetailsModule::class,
         MovieDetailsPresentationModule::class,
         NowPlayingModule::class,
+        PopularModule::class,
+        TopRatedModule::class,
         ActorMovieCreditsModule::class,
         ActivityBuildersModule::class,
         AndroidInjectionModule::class]
@@ -40,7 +46,8 @@ interface AppComponent : AndroidInjector<MyApp> {
 
     fun nowPlayingComponent(): NowPlayingComponent.Factory
     fun actorMovieCreditsComponent(): ActorMovieCreditsComponent.Factory
-
+    fun popularComponent(): PopularComponent.Factory
+    fun topRatedComponent(): TopRatedComponent.Factory
     fun movideDetailsFactoryImpl(): MovieDetailsViewModelFactoryImpl
     fun movieDetailsComponent(): MovieDetailsComponent.Factory
 }

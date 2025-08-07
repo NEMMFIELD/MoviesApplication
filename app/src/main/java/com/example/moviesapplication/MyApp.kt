@@ -3,15 +3,20 @@ package com.example.moviesapplication
 import android.app.Application
 import com.example.movies.actorfilms.di.ActorMovieCreditsComponent
 import com.example.movies.actorfilms.di.ActorMovieCreditsComponentProvider
-import com.example.movies.nowplaying.di.NowPlayingComponentProvider
 import com.example.movies.nowplaying.di.NowPlayingComponent
+import com.example.movies.nowplaying.di.NowPlayingComponentProvider
+import com.example.movies.toprated.di.TopRatedComponent
+import com.example.movies.toprated.di.TopRatedComponentProvider
+import com.example.movies_popular.di.PopularComponent
+import com.example.movies_popular.di.PopularComponentProvider
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
 
-class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector, ActorMovieCreditsComponentProvider{
+class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector,
+    ActorMovieCreditsComponentProvider, PopularComponentProvider, TopRatedComponentProvider {
 
     lateinit var appComponent: AppComponent
 
@@ -34,7 +39,15 @@ class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector, Ac
     }
 
     override fun ActorMovieCreditsComponent(): ActorMovieCreditsComponent {
-       return appComponent.actorMovieCreditsComponent().create()
+        return appComponent.actorMovieCreditsComponent().create()
+    }
+
+    override fun providePopularComponent(): PopularComponent {
+        return appComponent.popularComponent().create()
+    }
+
+    override fun provideTopRatedComponent(): TopRatedComponent {
+        return appComponent.topRatedComponent().create()
     }
 
 }

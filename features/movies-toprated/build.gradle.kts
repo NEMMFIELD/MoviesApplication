@@ -1,22 +1,20 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kapt)
+    id("kotlin-parcelize")
 }
 
 android {
-    namespace = "com.example.moviesapplication"
+    namespace = "com.example.movies.toprated"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.moviesapplication"
         minSdk = 28
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -41,42 +39,38 @@ android {
 }
 
 dependencies {
-    implementation(libs.accompanist.systemuicontroller)
+
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.material)
     implementation(libs.dagger)
-    implementation(libs.retrofit)
-    implementation(libs.okhttp)
-    implementation(libs.retrofit.converter.gson)
-    implementation(libs.okhttp.logging)
-    implementation(libs.transport.api)
     kapt(libs.dagger.compiler)
     implementation(libs.dagger.android)
     implementation(libs.dagger.android.support)
     kapt(libs.dagger.android.processor)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.activity.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.coil.compose)
+    implementation(libs.coil3.coil.network.okhttp)
+    implementation(libs.androidx.material.icons.extended)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(project(":core:movies-api"))
-    implementation(project(":features:movies-nowplaying"))
-    implementation(project(":features:movies-details"))
-    implementation(project(":features:movies-popular"))
-    implementation(project(":features:movies-toprated"))
-    implementation(project(":features:movies-actorfilms"))
+    implementation(project(":core:state"))
     implementation(project(":core:core-di"))
     implementation(project(":core:core-ui"))
     implementation(project(":core:core-navigation"))
-
+    implementation(project(":core:core-model"))
+    implementation(project(":features:movies-details"))
 }

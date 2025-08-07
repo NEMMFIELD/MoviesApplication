@@ -1,5 +1,6 @@
 package com.example.movies.nowplaying.data
 
+import com.example.core_model.MovieMapper
 import com.example.core_model.MovieModel
 import com.example.movies.api.MoviesApi
 import com.example.movies.nowplaying.domain.NowPlayingRepository

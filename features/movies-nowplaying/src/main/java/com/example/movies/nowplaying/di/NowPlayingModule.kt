@@ -6,7 +6,6 @@ import com.example.movies.nowplaying.data.NowPlayingRepositoryImpl
 import com.example.movies.nowplaying.domain.NowPlayingMoviesUseCase
 import com.example.movies.nowplaying.domain.NowPlayingRepository
 import com.example.movies.nowplaying.ui.NowPlayingViewModelFactory
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 

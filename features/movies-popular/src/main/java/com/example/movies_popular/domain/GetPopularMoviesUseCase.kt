@@ -1,7 +1,7 @@
 package com.example.movies_popular.domain
 
+import com.example.core_model.MovieMapper
 import com.example.core_model.MovieModel
-import com.example.movies_popular.data.PopularMovieMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -12,7 +12,7 @@ class GetPopularMoviesUseCase @Inject constructor(private val popularRepository:
     fun execute(page: Int): Flow<List<MovieModel>?> = flow {
         val popularDtoResponse = popularRepository.loadPopularMovies(page)
         val popularMovies = popularDtoResponse.results?.map { movieDto ->
-            PopularMovieMapper.mapDtoToModel(movieDto)
+            MovieMapper.mapDtoToModel(movieDto)
         }
         emit(popularMovies)
     }.flowOn(Dispatchers.IO)
