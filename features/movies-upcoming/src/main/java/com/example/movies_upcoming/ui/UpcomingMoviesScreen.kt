@@ -84,8 +84,10 @@ fun UpcomingMoviesList(upcomingViewModel: UpcomingViewModel, navController: NavC
     }
     when (val currentState = state) {
         is com.example.state.State.Success -> {
+            val sortedUpcomingList = currentState.data.orEmpty()
+                .sortedByDescending { list -> list.releaseDate }
             UpcomingGrid(
-                movies = currentState.data.orEmpty(),
+                movies = sortedUpcomingList,
                 isLoading = isLoading,
                 onMovieClick = { movieId ->
                     navController.navigate(movieDetailsRoute(movieId))
