@@ -38,7 +38,6 @@ class TopRatedViewModel @Inject constructor(private val getTopRatedMoviesUseCase
 
     fun loadTopRatedMovies() {
         if (_isLoading.value || isLastPage) return
-        if (_topRatedMoviesValue.value is State.Success) return
 
         _isLoading.value = true
 

@@ -38,7 +38,6 @@ class PopularViewModel @Inject constructor(private val getPopularMoviesUseCase: 
 
     fun loadPopularMovies() {
         if (_isLoading.value || isLastPage) return
-        if (_popularMoviesValue.value is State.Success) return
 
         _isLoading.value = true
 

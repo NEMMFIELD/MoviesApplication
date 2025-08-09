@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.PlayArrow
@@ -20,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,6 +32,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -132,6 +136,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val navController = rememberNavController()
+                    val saveableStateHolder = rememberSaveableStateHolder()
                     val bottomRoutes = listOf(
                         BottomNavItem.NowPlaying.route,
                         BottomNavItem.Popular.route,
@@ -153,31 +158,37 @@ class MainActivity : ComponentActivity() {
                             startDestination = BottomNavItem.NowPlaying.route,
                             modifier = Modifier.padding(innerPading)
                         ) {
-                            composable(NOW_PLAYING_ROUTE) {
-                                NowPlayingMoviesList(
-                                    navController = navController, viewModel = nowPlayingViewModel
-                                )
+                            composable(NOW_PLAYING_ROUTE) { backStackEntry ->
+                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                                    NowPlayingMoviesList(
+                                        navController = navController,
+                                        viewModel = nowPlayingViewModel
+                                    )
+                                }
                             }
-
-                            composable(BottomNavItem.Popular.route) {
-                                PopularMoviesList(
-                                    navController = navController,
-                                    popularViewModel = popularViewModel,
-                                )
+                            composable(BottomNavItem.Popular.route) { backStackEntry ->
+                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                                    PopularMoviesList(
+                                        navController = navController,
+                                        popularViewModel = popularViewModel
+                                    )
+                                }
                             }
-
-                            composable(BottomNavItem.TopRated.route) {
-                                TopRatedMoviesList(
-                                    navController = navController,
-                                    topRatedViewModel = topRatedViewModel
-                                )
+                            composable(BottomNavItem.TopRated.route) { backStackEntry ->
+                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                                    TopRatedMoviesList(
+                                        navController = navController,
+                                        topRatedViewModel = topRatedViewModel
+                                    )
+                                }
                             }
-
-                            composable(BottomNavItem.Upcoming.route) {
-                                UpcomingMoviesList(
-                                    navController = navController,
-                                    upcomingViewModel = upcomingViewModel
-                                )
+                            composable(BottomNavItem.Upcoming.route) { backStackEntry ->
+                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                                    UpcomingMoviesList(
+                                        navController = navController,
+                                        upcomingViewModel = upcomingViewModel
+                                    )
+                                }
                             }
 
                             composable(
@@ -250,9 +261,6 @@ fun BottomNavBar(navController: NavController) {
                 onClick = {
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {
-                            popUpTo(BottomNavItem.NowPlaying.route) {
-                                saveState = true
-                            }
                             launchSingleTop = true
                             restoreState = true
                         }

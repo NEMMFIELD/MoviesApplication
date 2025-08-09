@@ -1,5 +1,7 @@
 package com.example.movies.nowplaying.ui
 
+
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,6 +11,7 @@ import com.example.state.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,6 +19,8 @@ import javax.inject.Inject
 
 class NowPlayingViewModel @Inject constructor(private val nowPlayingMoviesUseCase: NowPlayingMoviesUseCase) :
     ViewModel() {
+    val lazyGridState = LazyGridState()
+
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         _nowPlayingMoviesValue.update { State.Failure(throwable) }
         _isLoading.value = false
@@ -37,9 +42,9 @@ class NowPlayingViewModel @Inject constructor(private val nowPlayingMoviesUseCas
         loadNowPlayingMovies()
     }
 
+
     fun loadNowPlayingMovies() {
         if (_isLoading.value || isLastPage) return
-        if (_nowPlayingMoviesValue.value is State.Success) return
 
         _isLoading.value = true
 

@@ -1,5 +1,9 @@
+@file:OptIn(FlowPreview::class)
+
 package com.example.movies.nowplaying.ui
 
+import android.content.Context.MODE_PRIVATE
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -18,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -42,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -49,23 +53,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.math.floor
 
 
 @Composable
-fun NowPlayingMoviesList(viewModel: NowPlayingViewModel, navController: NavController) {
+fun NowPlayingMoviesList(
+    viewModel: NowPlayingViewModel,
+    navController: NavController,
+) {
+
     val state by viewModel.nowPlayingMoviesValue.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val gridState = rememberLazyGridState()
+
+    val gridState = viewModel.lazyGridState
 
     LaunchedEffect(gridState) {
         snapshotFlow { gridState.layoutInfo }
@@ -78,10 +92,10 @@ fun NowPlayingMoviesList(viewModel: NowPlayingViewModel, navController: NavContr
             .collect { shouldLoadNextPage ->
                 if (shouldLoadNextPage && !isLoading && !viewModel.isLastPage) {
                     viewModel.loadNowPlayingMovies()
+                    Log.d("Next page",shouldLoadNextPage.toString())
                 }
             }
     }
-
 
     when (val currentState = state) {
         is com.example.state.State.Success -> {

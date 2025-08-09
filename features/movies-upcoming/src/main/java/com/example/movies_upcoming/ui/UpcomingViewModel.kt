@@ -37,7 +37,6 @@ class UpcomingViewModel @Inject constructor(private val getUpcomingMoviesUseCase
 
     fun loadPopularMovies() {
         if (_isLoading.value || isLastPage) return
-        if (_upcomingMoviesValue.value is State.Success) return
 
         _isLoading.value = true
 
