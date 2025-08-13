@@ -26,14 +26,39 @@ class TopRatedViewModel @Inject constructor(private val getTopRatedMoviesUseCase
     val topRatedMoviesValue: StateFlow<State<List<MovieModel>?>>
         get() = _topRatedMoviesValue
 
-    private var currentPage = 1
+    private var lastSavedPosition: Pair<Int, Int>? = null
+
+    var currentPage = 1
+        private set
+
     var isLastPage = false
+        private set
+
+    var isFirstLoad = true
+        private set
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     private val loadedPopularMovies = mutableListOf<MovieModel>()
 
     init {
         loadTopRatedMovies()
+    }
+
+    fun saveScrollPosition(index: Int, offset: Int) {
+        // Игнорируем позицию (0,0), если уже была сохранена
+        //if (index == 0 && offset == 0 && lastSavedPosition != null) return
+
+        // Игнорируем резкие скачки (например, при ресете списка)
+        lastSavedPosition?.let { (lastIndex, _) ->
+            if (kotlin.math.abs(index - lastIndex) > 20) return
+        }
+
+        lastSavedPosition = index to offset
+    }
+
+    fun getScrollPosition(): Pair<Int, Int> {
+        return lastSavedPosition ?: (0 to 0)
     }
 
     fun loadTopRatedMovies() {

@@ -2,7 +2,6 @@
 
 package com.example.movies.nowplaying.ui
 
-import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -53,71 +52,93 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.edit
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
+import com.example.state.State
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlin.math.floor
 
 
 @Composable
 fun NowPlayingMoviesList(
     viewModel: NowPlayingViewModel,
-    navController: NavController,
+    navController: NavController
 ) {
-
     val state by viewModel.nowPlayingMoviesValue.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    val gridState = viewModel.lazyGridState
+    val gridState = rememberLazyGridState()
+    var hasScrolled by remember { mutableStateOf(false) }
 
-    LaunchedEffect(gridState) {
-        snapshotFlow { gridState.layoutInfo }
-            .map { layoutInfo ->
-                val totalitems = layoutInfo.totalItemsCount
-                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                lastVisibleItem >= totalitems - 3
+    // Прокручиваем к сохранённой позиции после загрузки первой страницы
+    if (state is State.Success && !hasScrolled) {
+        val data = (state as State.Success<List<MovieModel>?>).data.orEmpty()
+        if (data.isNotEmpty()) {
+            LaunchedEffect(data) {
+                val (index, offset) = viewModel.getScrollPosition()
+                gridState.scrollToItem(index.coerceIn(0, data.size - 1), offset)
+                hasScrolled = true
             }
+        }
+    }
+
+    // Сохраняем позицию скролла, но с debounce
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.firstVisibleItemIndex to gridState.firstVisibleItemScrollOffset }
+            .debounce(150)
+            .collect { (index, offset) ->
+                viewModel.saveScrollPosition(index, offset)
+            }
+    }
+
+    // Пагинация — реагируем только на индекс последнего видимого элемента
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
-            .collect { shouldLoadNextPage ->
-                if (shouldLoadNextPage && !isLoading && !viewModel.isLastPage) {
+            .collect { lastVisibleItem ->
+                val totalItems = gridState.layoutInfo.totalItemsCount
+                if (lastVisibleItem != null &&
+                    lastVisibleItem >= totalItems - 3 &&
+                    !isLoading &&
+                    !viewModel.isLastPage
+                ) {
                     viewModel.loadNowPlayingMovies()
-                    Log.d("Next page",shouldLoadNextPage.toString())
                 }
             }
     }
 
-    when (val currentState = state) {
-        is com.example.state.State.Success -> {
+    when (state) {
+        is State.Success -> {
             NowPlayingGrid(
-                movies = currentState.data.orEmpty(),
+                movies = (state as State.Success<List<MovieModel>?>).data.orEmpty(),
                 isLoading = isLoading,
                 onMovieClick = { movieId ->
                     navController.navigate(movieDetailsRoute(movieId))
-                }, gridState = gridState
+                },
+                gridState = gridState,
+                animateItems = viewModel.isFirstLoad
             )
         }
 
-        is com.example.state.State.Failure -> {
+        is State.Failure -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error: ${currentState.message.message ?: "Unknown error"}", color = Color.Red)
+                Text(
+                    "Error: ${(state as State.Failure).message.message ?: "Unknown error"}",
+                    color = Color.Red
+                )
             }
         }
 
-        com.example.state.State.Empty, null -> {
+        State.Empty, null -> {
             Box(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -126,12 +147,14 @@ fun NowPlayingMoviesList(
     }
 }
 
+
 @Composable
 fun NowPlayingGrid(
     movies: List<MovieModel>,
     isLoading: Boolean,
     onMovieClick: (Int) -> Unit,
-    gridState: LazyGridState
+    gridState: LazyGridState,
+    animateItems: Boolean
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -141,7 +164,11 @@ fun NowPlayingGrid(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(movies) { movie ->
-            AnimatedMovieItem(movie = movie, onClick = { onMovieClick(movie.id ?: 0) })
+            AnimatedMovieItem(
+                movie = movie,
+                onClick = { onMovieClick(movie.id ?: 0) },
+                animate = animateItems
+            )
         }
 
         if (isLoading) {
@@ -160,20 +187,26 @@ fun NowPlayingGrid(
 }
 
 @Composable
-fun AnimatedMovieItem(movie: MovieModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    var visible by remember { mutableStateOf(false) }
+fun AnimatedMovieItem(
+    movie: MovieModel,
+    onClick: () -> Unit,
+    animate: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (animate) {
+        var visible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { visible = true }
 
-    LaunchedEffect(Unit) {
-        visible = true
-    }
-
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
-            initialOffsetY = { it / 4 },
-            animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-        )
-    ) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
+                initialOffsetY = { it / 4 },
+                animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+            )
+        ) {
+            MovieItem(movie = movie, onClick = onClick)
+        }
+    } else {
         MovieItem(movie = movie, onClick = onClick)
     }
 }

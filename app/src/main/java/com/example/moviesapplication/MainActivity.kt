@@ -19,10 +19,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,7 +35,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -76,163 +78,163 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var nowPlayingViewModelFactory: NowPlayingViewModelFactory
 
-    private lateinit var nowPlayingViewModel: NowPlayingViewModel
-
     @Inject
     lateinit var popularViewModelFactory: PopularViewModelFactory
-
-    private lateinit var popularViewModel: PopularViewModel
 
     @Inject
     lateinit var topRatedViewModelFactory: TopRatedViewModelFactory
 
-    private lateinit var topRatedViewModel: TopRatedViewModel
-
     @Inject
     lateinit var upcomingViewModelFactory: UpcomingViewModelFactory
-
-    private lateinit var upcomingViewModel: UpcomingViewModel
 
     @Inject
     lateinit var actorMovieCreditsViewModelFactory: ActorMovieCreditsViewModelFactory
 
-    private lateinit var actorMovieCreditsViewModel: ActorMovieCreditsViewModel
-
     @Inject
     lateinit var movieDetailsViewModelFactory: MovieDetailsViewModelFactoryImpl
 
+    private lateinit var nowPlayingViewModel: NowPlayingViewModel
+    private lateinit var popularViewModel: PopularViewModel
+    private lateinit var topRatedViewModel: TopRatedViewModel
+    private lateinit var upcomingViewModel: UpcomingViewModel
+    private lateinit var actorMovieCreditsViewModel: ActorMovieCreditsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)  // если используешь Dagger Android
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-            controller.isAppearanceLightStatusBars =
-                false // Если нужно сделать контент под темный фон
+            controller.isAppearanceLightStatusBars = false
             controller.hide(WindowInsetsCompat.Type.statusBars())
         }
 
+        // Инициализируем ViewModel через фабрики
         nowPlayingViewModel =
             ViewModelProvider(this, nowPlayingViewModelFactory)[NowPlayingViewModel::class.java]
-
         popularViewModel =
             ViewModelProvider(this, popularViewModelFactory)[PopularViewModel::class.java]
-
         topRatedViewModel =
             ViewModelProvider(this, topRatedViewModelFactory)[TopRatedViewModel::class.java]
-
         upcomingViewModel =
             ViewModelProvider(this, upcomingViewModelFactory)[UpcomingViewModel::class.java]
-
         actorMovieCreditsViewModel = ViewModelProvider(
-            this, actorMovieCreditsViewModelFactory
+            this,
+            actorMovieCreditsViewModelFactory
         )[ActorMovieCreditsViewModel::class.java]
-
 
         setContent {
             MoviesTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    val navController = rememberNavController()
-                    val saveableStateHolder = rememberSaveableStateHolder()
-                    val bottomRoutes = listOf(
-                        BottomNavItem.NowPlaying.route,
-                        BottomNavItem.Popular.route,
-                        BottomNavItem.TopRated.route,
-                        BottomNavItem.Upcoming.route
-                    )
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentRoute = navBackStackEntry?.destination?.route
+                val navController = rememberNavController().also {
+                    Log.d("NavControllerCheck", "NavController created: $it")
+                }
+                LaunchedEffect(Unit) {
+                    Log.d("NavControllerCheck", "LaunchedEffect: NavController is $navController")
+                }
 
+                DisposableEffect(Unit) {
+                    Log.d("NavControllerCheck", "DisposableEffect: NavController is $navController")
+
+                    onDispose {
+                        Log.d("NavControllerCheck", "NavController disposed: $navController")
+                    }
+                }
+                val saveableStateHolder = rememberSaveableStateHolder()
+                Surface(modifier = Modifier.fillMaxSize()) {
                     Scaffold(
                         bottomBar = {
-                            if (currentRoute in bottomRoutes) {
+                            val navBackStackEntry by navController.currentBackStackEntryAsState()
+                            val currentRoute = navBackStackEntry?.destination?.route
+                            if (currentRoute in listOf(
+                                    BottomNavItem.NowPlaying.route,
+                                    BottomNavItem.Popular.route,
+                                    BottomNavItem.TopRated.route,
+                                    BottomNavItem.Upcoming.route
+                                )
+                            ) {
                                 BottomNavBar(navController)
                             }
                         }
-                    ) { innerPading ->
+                    ) { innerPadding ->
                         NavHost(
                             navController = navController,
                             startDestination = BottomNavItem.NowPlaying.route,
-                            modifier = Modifier.padding(innerPading)
+                            modifier = Modifier.padding(innerPadding)
                         ) {
-                            composable(NOW_PLAYING_ROUTE) { backStackEntry ->
-                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                            // Bottom Nav Items
+                            composable(NOW_PLAYING_ROUTE) {
+                                saveableStateHolder.SaveableStateProvider(NOW_PLAYING_ROUTE) {
                                     NowPlayingMoviesList(
+                                        viewModel = nowPlayingViewModel,
                                         navController = navController,
-                                        viewModel = nowPlayingViewModel
+
                                     )
                                 }
                             }
-                            composable(BottomNavItem.Popular.route) { backStackEntry ->
-                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                            composable(POPULAR_ROUTE) {
+                                saveableStateHolder.SaveableStateProvider(POPULAR_ROUTE) {
                                     PopularMoviesList(
+                                        popularViewModel = popularViewModel,
                                         navController = navController,
-                                        popularViewModel = popularViewModel
                                     )
                                 }
                             }
-                            composable(BottomNavItem.TopRated.route) { backStackEntry ->
-                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                            composable(TOP_RATED_ROUTE) {
+                                saveableStateHolder.SaveableStateProvider(TOP_RATED_ROUTE) {
                                     TopRatedMoviesList(
+                                        topRatedViewModel = topRatedViewModel,
                                         navController = navController,
-                                        topRatedViewModel = topRatedViewModel
                                     )
                                 }
                             }
-                            composable(BottomNavItem.Upcoming.route) { backStackEntry ->
-                                saveableStateHolder.SaveableStateProvider(backStackEntry.id) {
+                            composable(UPCOMING_ROUTE) {
+                                saveableStateHolder.SaveableStateProvider(UPCOMING_ROUTE) {
                                     UpcomingMoviesList(
+                                        upcomingViewModel = upcomingViewModel,
                                         navController = navController,
-                                        upcomingViewModel = upcomingViewModel
                                     )
                                 }
                             }
 
+                            // Movie Details
                             composable(
                                 route = "$MOVIE_DETAILS_ROUTE/{$MOVIE_ID_ARG}",
-                                arguments = listOf(navArgument(MOVIE_ID_ARG) {
-                                    type = NavType.IntType
-                                })
+                                arguments = listOf(navArgument(MOVIE_ID_ARG) { type = NavType.IntType })
                             ) { backStackEntry ->
                                 val movieId = backStackEntry.arguments?.getInt(MOVIE_ID_ARG)
                                 val viewModel: MovieDetailsViewModel = viewModel(
-                                    factory = movieDetailsViewModelFactory.provideFactory(
-                                        backStackEntry
-                                    ),
+                                    factory = movieDetailsViewModelFactory.provideFactory(backStackEntry),
                                     viewModelStoreOwner = backStackEntry
                                 )
                                 LaunchedEffect(movieId) {
-                                    Log.d("MovieDetails", "Loading details for movieId=$movieId")
                                     viewModel.loadMovieDetails(movieId)
                                     viewModel.loadMovieActors(movieId)
                                 }
-
                                 MovieDetailsScreen(
                                     viewModel = viewModel,
-                                    navController
+                                    navController = navController
                                 )
                             }
+
+                            // Actor Movie Credits
                             composable(
                                 route = "$ACTOR_MOVIE_CREDITS_ROUTE/{$ACTOR_ID_ARG}",
-                                arguments = listOf(navArgument(ACTOR_ID_ARG) {
-                                    type = NavType.IntType
-                                })
+                                arguments = listOf(navArgument(ACTOR_ID_ARG) { type = NavType.IntType })
                             ) { backStackEntry ->
                                 val actorId = backStackEntry.arguments?.getInt(ACTOR_ID_ARG) ?: 0
                                 val viewModel = ViewModelProvider(
                                     backStackEntry,
                                     actorMovieCreditsViewModelFactory
                                 )[ActorMovieCreditsViewModel::class.java]
-                                LaunchedEffect(actorId) { viewModel.loadActorMovieCredits(actorId) }
-
+                                LaunchedEffect(actorId) {
+                                    viewModel.loadActorMovieCredits(actorId)
+                                }
                                 ActorMovieCreditsScreen(
                                     viewModel = viewModel,
-                                    onActorClick = { actorId ->
-                                        navController.navigate(actorMovieCreditsRoute(actorId))
-                                    }, navController
+                                    onActorClick = {
+                                        navController.navigate(actorMovieCreditsRoute(it))
+                                    },
+                                    navController = navController
                                 )
                             }
                         }
@@ -244,7 +246,18 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BottomNavBar(navController: NavController) {
+fun rememberSaveableLazyGridState(key: String): LazyGridState {
+    Log.d("LazyGridState", "Creating LazyGridState for key: $key") // <-- Лог при создании
+    return rememberSaveable(key, saver = LazyGridState.Saver) {
+        Log.d("LazyGridState", "Inside rememberSaveable initializer for key: $key")
+        LazyGridState()
+    }
+}
+
+@Composable
+fun BottomNavBar(
+    navController: NavController
+) {
     val items = listOf(
         BottomNavItem.NowPlaying,
         BottomNavItem.Popular,
@@ -263,6 +276,9 @@ fun BottomNavBar(navController: NavController) {
                         navController.navigate(item.route) {
                             launchSingleTop = true
                             restoreState = true
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
                         }
                     }
                 },

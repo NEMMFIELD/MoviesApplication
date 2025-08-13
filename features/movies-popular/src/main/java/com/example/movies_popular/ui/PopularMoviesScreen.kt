@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -56,8 +55,9 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
+import com.example.state.State
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlin.math.floor
 
 @Composable
@@ -65,39 +65,65 @@ fun PopularMoviesList(popularViewModel: PopularViewModel, navController: NavCont
     val state by popularViewModel.popularMoviesValue.collectAsState()
     val isLoading by popularViewModel.isLoading.collectAsState()
     val gridState = rememberLazyGridState()
+    var hasScrolled by remember { mutableStateOf(false) }
 
-    LaunchedEffect(gridState) {
-        snapshotFlow { gridState.layoutInfo }
-            .map { layoutInfo ->
-                val totalitems = layoutInfo.totalItemsCount
-                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                lastVisibleItem >= totalitems - 3
+    // Прокручиваем к сохранённой позиции после загрузки первой страницы
+    if (state is State.Success && !hasScrolled) {
+        val data = (state as State.Success<List<MovieModel>?>).data.orEmpty()
+        if (data.isNotEmpty()) {
+            LaunchedEffect(data) {
+                val (index, offset) = popularViewModel.getScrollPosition()
+                gridState.scrollToItem(index.coerceIn(0, data.size - 1), offset)
+                hasScrolled = true
             }
+        }
+    }
+
+    // Сохраняем позицию скролла, но с debounce
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.firstVisibleItemIndex to gridState.firstVisibleItemScrollOffset }
+            .debounce(150)
+            .collect { (index, offset) ->
+                popularViewModel.saveScrollPosition(index, offset)
+            }
+    }
+
+    // Пагинация — реагируем только на индекс последнего видимого элемента
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
-            .collect { shouldLoadNextPage ->
-                if (shouldLoadNextPage && !isLoading && !popularViewModel.isLastPage) {
+            .collect { lastVisibleItem ->
+                val totalItems = gridState.layoutInfo.totalItemsCount
+                if (lastVisibleItem != null &&
+                    lastVisibleItem >= totalItems - 3 &&
+                    !isLoading &&
+                    !popularViewModel.isLastPage
+                ) {
                     popularViewModel.loadPopularMovies()
                 }
             }
     }
+
     when (val currentState = state) {
-        is com.example.state.State.Success -> {
-           PopularGrid(
+        is State.Success -> {
+            PopularGrid(
                 movies = currentState.data.orEmpty(),
                 isLoading = isLoading,
                 onMovieClick = { movieId ->
                     navController.navigate(movieDetailsRoute(movieId))
-                }, gridState = gridState
+                },
+                gridState = gridState,
+                animateItems = popularViewModel.isFirstLoad
             )
         }
 
-        is com.example.state.State.Failure -> {
+        is State.Failure -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Error: ${currentState.message.message ?: "Unknown error"}", color = Color.Red)
             }
         }
 
-        com.example.state.State.Empty, null -> {
+        State.Empty, null -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -114,7 +140,8 @@ fun PopularGrid(
     movies: List<MovieModel>,
     isLoading: Boolean,
     onMovieClick: (Int) -> Unit,
-    gridState: LazyGridState
+    gridState: LazyGridState,
+    animateItems: Boolean
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -124,7 +151,11 @@ fun PopularGrid(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(movies) { movie ->
-            AnimatedMovieItem(movie = movie, onClick = { onMovieClick(movie.id ?: 0) })
+            AnimatedMovieItem(
+                movie = movie,
+                onClick = { onMovieClick(movie.id ?: 0) },
+                animateItems
+            )
         }
 
         if (isLoading) {
@@ -143,20 +174,26 @@ fun PopularGrid(
 }
 
 @Composable
-fun AnimatedMovieItem(movie: MovieModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    var visible by remember { mutableStateOf(false) }
+fun AnimatedMovieItem(
+    movie: MovieModel,
+    onClick: () -> Unit,
+    animate: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (animate) {
+        var visible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { visible = true }
 
-    LaunchedEffect(Unit) {
-        visible = true
-    }
-
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
-            initialOffsetY = { it / 4 },
-            animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-        )
-    ) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
+                initialOffsetY = { it / 4 },
+                animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+            )
+        ) {
+            PopularMovieItem(movie = movie, onClick = onClick)
+        }
+    } else {
         PopularMovieItem(movie = movie, onClick = onClick)
     }
 }

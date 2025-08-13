@@ -13,11 +13,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class UpcomingViewModel @Inject constructor(private val getUpcomingMoviesUseCase: GetUpcomingMoviesUseCase): ViewModel() {
+class UpcomingViewModel @Inject constructor(private val getUpcomingMoviesUseCase: GetUpcomingMoviesUseCase) :
+    ViewModel() {
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         _upcomingMoviesValue.update { com.example.state.State.Failure(throwable) }
         _isLoading.value = false
     }
+
+    private var lastSavedPosition: Pair<Int, Int>? = null
 
     private val _upcomingMoviesValue: MutableStateFlow<State<List<MovieModel>?>> =
         MutableStateFlow(State.Empty)
@@ -25,17 +28,40 @@ class UpcomingViewModel @Inject constructor(private val getUpcomingMoviesUseCase
     val upcomingMoviesValue: StateFlow<State<List<MovieModel>?>>
         get() = _upcomingMoviesValue
 
-    private var currentPage = 1
+    var currentPage = 1
+        private set
+
     var isLastPage = false
+        private set
+
+    var isFirstLoad = true
+        private set
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     private val loadedPopularMovies = mutableListOf<MovieModel>()
 
     init {
-        loadPopularMovies()
+        loadUpcomingMovies()
     }
 
-    fun loadPopularMovies() {
+    fun saveScrollPosition(index: Int, offset: Int) {
+        // Игнорируем позицию (0,0), если уже была сохранена
+        //if (index == 0 && offset == 0 && lastSavedPosition != null) return
+
+        // Игнорируем резкие скачки (например, при ресете списка)
+        lastSavedPosition?.let { (lastIndex, _) ->
+            if (kotlin.math.abs(index - lastIndex) > 20) return
+        }
+
+        lastSavedPosition = index to offset
+    }
+
+    fun getScrollPosition(): Pair<Int, Int> {
+        return lastSavedPosition ?: (0 to 0)
+    }
+
+    fun loadUpcomingMovies() {
         if (_isLoading.value || isLastPage) return
 
         _isLoading.value = true
