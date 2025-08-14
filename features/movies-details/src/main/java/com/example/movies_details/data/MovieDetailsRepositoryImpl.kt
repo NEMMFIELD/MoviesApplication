@@ -10,13 +10,11 @@ class MovieDetailsRepositoryImpl @Inject constructor(private val moviesApi: Movi
     MovieDetailsRepository {
     override suspend fun getMovieDetails(movieId: Int): MovieDetailsResponse {
         return moviesApi.getMovieDetails(
-            apiKey = "56b9fc3e2f7cf0c570b8d7dc71de180e",
             movieId = movieId
         )
     }
 
     override suspend fun getMovieActors(movieId: Int): MovieActorsResponse {
-        return moviesApi.getMovieActors(apiKey = "56b9fc3e2f7cf0c570b8d7dc71de180e",
-                                        movieId = movieId)
+        return moviesApi.getMovieActors(movieId = movieId)
     }
 }

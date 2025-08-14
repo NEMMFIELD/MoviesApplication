@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class NowPlayingRepositoryImpl @Inject constructor(private val moviesApi: MoviesApi): NowPlayingRepository {
     override suspend fun getNowPlayingMovies(page:Int): List<MovieModel>? {
-        val apiResponse = moviesApi.getNowPlayingMovies("56b9fc3e2f7cf0c570b8d7dc71de180e", page = page)
+        val apiResponse = moviesApi.getNowPlayingMovies(page = page)
         val nowPlayingMovies = apiResponse.results?.map { moviesDto ->
             MovieMapper.mapDtoToModel(moviesDto)
         }

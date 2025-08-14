@@ -8,6 +8,6 @@ import javax.inject.Inject
 class UpcomingRepositoryImpl @Inject constructor(private val moviesApi: MoviesApi) :
     UpcomingRepository {
     override suspend fun getUpcomingMovies(page: Int): DTOResponse {
-        return moviesApi.getUpcomingMovies("56b9fc3e2f7cf0c570b8d7dc71de180e", page = page)
+        return moviesApi.getUpcomingMovies(page = page)
     }
 }

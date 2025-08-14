@@ -8,6 +8,6 @@ import javax.inject.Inject
 class ActorMovieCreditsRepositoryImpl @Inject constructor(private val moviesApi: MoviesApi) :
     ActorMovieCreditsRepository {
     override suspend fun getActorMoviesCredits(actorId: Int?): ActorMovieCreditsResponse {
-        return moviesApi.getActorMoviesCredits(actorId ?: 0, apiKey = "56b9fc3e2f7cf0c570b8d7dc71de180e")
+        return moviesApi.getActorMoviesCredits(actorId ?: 0)
     }
 }
