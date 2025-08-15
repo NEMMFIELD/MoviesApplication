@@ -1,5 +1,6 @@
 package com.example.moviesapplication
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -22,10 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -55,8 +54,10 @@ import com.example.movies_details.navigation.ACTOR_ID_ARG
 import com.example.movies_details.navigation.ACTOR_MOVIE_CREDITS_ROUTE
 import com.example.movies_details.navigation.MOVIE_DETAILS_ROUTE
 import com.example.movies_details.navigation.MOVIE_ID_ARG
+import com.example.movies_details.navigation.MOVIE_TITLE_ARG
 import com.example.movies_details.navigation.NOW_PLAYING_ROUTE
 import com.example.movies_details.navigation.POPULAR_ROUTE
+import com.example.movies_details.navigation.RATING_ROUTE
 import com.example.movies_details.navigation.TOP_RATED_ROUTE
 import com.example.movies_details.navigation.UPCOMING_ROUTE
 import com.example.movies_details.navigation.actorMovieCreditsRoute
@@ -66,6 +67,9 @@ import com.example.movies_details.ui.MovieDetailsViewModelFactoryImpl
 import com.example.movies_popular.ui.PopularMoviesList
 import com.example.movies_popular.ui.PopularViewModel
 import com.example.movies_popular.ui.PopularViewModelFactory
+import com.example.movies_rating.ui.MoviesRatingScreen
+import com.example.movies_rating.ui.MoviesRatingViewModel
+import com.example.movies_rating.ui.MoviesRatingViewModelFactory
 import com.example.movies_upcoming.ui.UpcomingMoviesList
 import com.example.movies_upcoming.ui.UpcomingViewModel
 import com.example.movies_upcoming.ui.UpcomingViewModelFactory
@@ -88,6 +92,9 @@ class MainActivity : ComponentActivity() {
     lateinit var upcomingViewModelFactory: UpcomingViewModelFactory
 
     @Inject
+    lateinit var moviesRatingViewModelFactory: MoviesRatingViewModelFactory
+
+    @Inject
     lateinit var actorMovieCreditsViewModelFactory: ActorMovieCreditsViewModelFactory
 
     @Inject
@@ -98,6 +105,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var topRatedViewModel: TopRatedViewModel
     private lateinit var upcomingViewModel: UpcomingViewModel
     private lateinit var actorMovieCreditsViewModel: ActorMovieCreditsViewModel
+    private lateinit var moviesRatingViewModel: MoviesRatingViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -112,33 +120,27 @@ class MainActivity : ComponentActivity() {
         // Инициализируем ViewModel через фабрики
         nowPlayingViewModel =
             ViewModelProvider(this, nowPlayingViewModelFactory)[NowPlayingViewModel::class.java]
+
         popularViewModel =
             ViewModelProvider(this, popularViewModelFactory)[PopularViewModel::class.java]
+
         topRatedViewModel =
             ViewModelProvider(this, topRatedViewModelFactory)[TopRatedViewModel::class.java]
+
         upcomingViewModel =
             ViewModelProvider(this, upcomingViewModelFactory)[UpcomingViewModel::class.java]
+
         actorMovieCreditsViewModel = ViewModelProvider(
             this,
             actorMovieCreditsViewModelFactory
         )[ActorMovieCreditsViewModel::class.java]
 
+        moviesRatingViewModel =
+            ViewModelProvider(this, moviesRatingViewModelFactory)[MoviesRatingViewModel::class.java]
+
         setContent {
             MoviesTheme {
-                val navController = rememberNavController().also {
-                    Log.d("NavControllerCheck", "NavController created: $it")
-                }
-                LaunchedEffect(Unit) {
-                    Log.d("NavControllerCheck", "LaunchedEffect: NavController is $navController")
-                }
-
-                DisposableEffect(Unit) {
-                    Log.d("NavControllerCheck", "DisposableEffect: NavController is $navController")
-
-                    onDispose {
-                        Log.d("NavControllerCheck", "NavController disposed: $navController")
-                    }
-                }
+                val navController = rememberNavController()
                 val saveableStateHolder = rememberSaveableStateHolder()
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Scaffold(
@@ -168,7 +170,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel = nowPlayingViewModel,
                                         navController = navController,
 
-                                    )
+                                        )
                                 }
                             }
                             composable(POPULAR_ROUTE) {
@@ -199,11 +201,15 @@ class MainActivity : ComponentActivity() {
                             // Movie Details
                             composable(
                                 route = "$MOVIE_DETAILS_ROUTE/{$MOVIE_ID_ARG}",
-                                arguments = listOf(navArgument(MOVIE_ID_ARG) { type = NavType.IntType })
+                                arguments = listOf(navArgument(MOVIE_ID_ARG) {
+                                    type = NavType.IntType
+                                })
                             ) { backStackEntry ->
                                 val movieId = backStackEntry.arguments?.getInt(MOVIE_ID_ARG)
                                 val viewModel: MovieDetailsViewModel = viewModel(
-                                    factory = movieDetailsViewModelFactory.provideFactory(backStackEntry),
+                                    factory = movieDetailsViewModelFactory.provideFactory(
+                                        backStackEntry
+                                    ),
                                     viewModelStoreOwner = backStackEntry
                                 )
                                 LaunchedEffect(movieId) {
@@ -216,10 +222,32 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
+                            // Rating Screen
+                            composable(
+                                route = "$RATING_ROUTE/{$MOVIE_ID_ARG}/{$MOVIE_TITLE_ARG}",
+                                arguments = listOf(
+                                    navArgument(MOVIE_ID_ARG) { type = NavType.IntType },
+                                    navArgument(MOVIE_TITLE_ARG) { type = NavType.StringType }
+                                )
+                            ) { backStackEntry ->
+                                val movieId = backStackEntry.arguments?.getInt(MOVIE_ID_ARG) ?: 0
+                                val movieTitle = backStackEntry.arguments?.getString(MOVIE_TITLE_ARG)?.let { Uri.decode(it) }
+
+                                MoviesRatingScreen(
+                                    movieId = movieId,
+                                    movieTitle = movieTitle ?: "",
+                                    viewModel = moviesRatingViewModel,
+                                    navController = navController,
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+
                             // Actor Movie Credits
                             composable(
                                 route = "$ACTOR_MOVIE_CREDITS_ROUTE/{$ACTOR_ID_ARG}",
-                                arguments = listOf(navArgument(ACTOR_ID_ARG) { type = NavType.IntType })
+                                arguments = listOf(navArgument(ACTOR_ID_ARG) {
+                                    type = NavType.IntType
+                                })
                             ) { backStackEntry ->
                                 val actorId = backStackEntry.arguments?.getInt(ACTOR_ID_ARG) ?: 0
                                 val viewModel = ViewModelProvider(
@@ -242,15 +270,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun rememberSaveableLazyGridState(key: String): LazyGridState {
-    Log.d("LazyGridState", "Creating LazyGridState for key: $key") // <-- Лог при создании
-    return rememberSaveable(key, saver = LazyGridState.Saver) {
-        Log.d("LazyGridState", "Inside rememberSaveable initializer for key: $key")
-        LazyGridState()
     }
 }
 

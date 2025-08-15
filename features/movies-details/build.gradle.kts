@@ -69,4 +69,5 @@ dependencies {
     implementation(project(":core:core-ui"))
     implementation(project(":core:core-navigation"))
     implementation(project(":features:movies-actorfilms"))
+    implementation(project(":features:movies-rating"))
 }

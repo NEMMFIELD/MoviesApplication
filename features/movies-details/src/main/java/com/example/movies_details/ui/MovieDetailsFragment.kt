@@ -43,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -51,11 +50,10 @@ import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import coil3.request.error
-import coil3.request.placeholder
-import com.example.movies_details.R
 import com.example.movies_details.data.MovieActorsModel
+import com.example.movies_details.data.MovieDetailsModel
 import com.example.movies_details.navigation.actorMovieCreditsRoute
+import com.example.movies_details.navigation.rateMovieRoute
 import com.example.state.State
 import com.google.accompanist.flowlayout.FlowRow
 import kotlin.math.floor
@@ -99,10 +97,11 @@ fun MovieDetailsScreen(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    MovieTitle(movie.title)
+                    MovieTitleWithRateButton(movie, navController)
                     MovieBackdrop(movie.fullbackDropUrl, movie.title)
                     MovieOverview(movie.overview)
                     MovieRatingAndGenres(movie.rating, movie.genres as List<String>?)
+
 
                     if (actorsState is State.Success) {
                         val actors = (actorsState as State.Success<List<MovieActorsModel>>).data
@@ -140,16 +139,42 @@ fun MovieDetailsScreen(
 }
 
 @Composable
-fun MovieTitle(title: String?) {
-    Text(
-        text = title ?: "No Title",
-        style = MaterialTheme.typography.headlineMedium,
-        textAlign = TextAlign.Center,
+fun MovieTitleWithRateButton(movie: MovieDetailsModel, navController: NavController) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
-    )
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Текст занимает всё оставшееся место
+        Text(
+            text = movie.title ?: "Unknown Title",
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+
+        // Кнопка с увеличенной звездочкой
+        IconButton(
+            onClick = { navController.navigate(rateMovieRoute(movie.id ?: 0, movie.title ?: "null")) },
+            modifier = Modifier
+                .size(50.dp) // чуть больше кнопка
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = CircleShape
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "Rate",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp) // увеличенная звезда
+            )
+        }
+    }
 }
+
 
 @Composable
 fun MovieBackdrop(url: String?, contentDesc: String?) {
@@ -301,8 +326,6 @@ fun ActorItem(
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(actor.fullProfilePath)
-                    .placeholder(R.drawable.prof) // замени на свой ресурс
-                    .error(R.drawable.prof)
                     .crossfade(true)
                     .build()
             ),

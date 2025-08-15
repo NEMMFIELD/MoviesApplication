@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 dependencyResolutionManagement {
@@ -16,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
@@ -33,3 +35,4 @@ include(":features:movies-popular")
 include(":core:core-model")
 include(":features:movies-toprated")
 include(":features:movies-upcoming")
+include(":features:movies-rating")

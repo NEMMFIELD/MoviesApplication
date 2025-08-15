@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/features/movies-details" />
             <option value="$PROJECT_DIR$/features/movies-nowplaying" />
             <option value="$PROJECT_DIR$/features/movies-popular" />
+            <option value="$PROJECT_DIR$/features/movies-rating" />
             <option value="$PROJECT_DIR$/features/movies-toprated" />
             <option value="$PROJECT_DIR$/features/movies-upcoming" />
           </set>
