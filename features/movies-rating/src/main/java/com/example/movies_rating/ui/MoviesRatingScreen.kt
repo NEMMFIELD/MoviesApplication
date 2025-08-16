@@ -96,7 +96,7 @@ fun MoviesRatingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { viewModel.rateMovie(movieId, rating.toDouble(), sessionId = "") },
+                onClick = { viewModel.rateMovie(movieId, rating.toDouble()) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFC107),
                     contentColor = Color.Black

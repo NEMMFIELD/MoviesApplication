@@ -5,6 +5,8 @@ import com.example.core.di.AppModule
 import com.example.core.di.NetworkModule
 import com.example.movies.actorfilms.di.ActorMovieCreditsComponent
 import com.example.movies.actorfilms.di.ActorMovieCreditsModule
+import com.example.movies.auth.di.MoviesAuthComponent
+import com.example.movies.auth.di.MoviesAuthModule
 import com.example.movies.nowplaying.di.NowPlayingComponent
 import com.example.movies.nowplaying.di.NowPlayingModule
 import com.example.movies.toprated.di.TopRatedComponent
@@ -37,6 +39,7 @@ import javax.inject.Singleton
         TopRatedModule::class,
         UpcomingModule::class,
         MoviesRatingModule::class,
+        MoviesAuthModule::class,
         ActorMovieCreditsModule::class,
         ActivityBuildersModule::class,
         AndroidInjectionModule::class]
@@ -58,4 +61,5 @@ interface AppComponent : AndroidInjector<MyApp> {
     fun movieDetailsFactoryImpl(): MovieDetailsViewModelFactoryImpl
     fun movieDetailsComponent(): MovieDetailsComponent.Factory
     fun moviesRatingComponent(): MoviesRatingComponent.Factory
+    fun moviesAuthComponent(): MoviesAuthComponent.Factory
 }

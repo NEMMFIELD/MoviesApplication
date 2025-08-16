@@ -1,6 +1,7 @@
 package com.example.movies_details.navigation
 
 import android.net.Uri
+const val AUTH_ROUTE = "auth"
 const val NOW_PLAYING_ROUTE = "now_playing"
 const val POPULAR_ROUTE = "popular"
 const val TOP_RATED_ROUTE = "top_rated"

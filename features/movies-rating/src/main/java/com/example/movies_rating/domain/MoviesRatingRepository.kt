@@ -6,4 +6,5 @@ import com.example.movies.api.model.RequestTokenResponse
 
 interface MoviesRatingRepository {
     suspend fun rateMovie(sessionId: String, movieId: Int, rating: Double): RatingResponse
+    fun getSessionId():String?
 }

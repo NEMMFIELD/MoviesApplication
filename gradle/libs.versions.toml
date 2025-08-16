@@ -29,6 +29,7 @@ material = "1.12.0"
 uiAndroid = "1.9.0"
 transportApi = "4.0.0"
 uiGraphics = "1.9.0"
+browser = "1.9.0"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -70,6 +71,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 transport-api = { group = "com.google.android.datatransport", name = "transport-api", version.ref = "transportApi" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
 
 [plugins]

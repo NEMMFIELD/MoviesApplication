@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -44,6 +45,9 @@ import com.example.core_ui.MoviesTheme
 import com.example.movies.actorfilms.ui.ActorMovieCreditsScreen
 import com.example.movies.actorfilms.ui.ActorMovieCreditsViewModel
 import com.example.movies.actorfilms.ui.ActorMovieCreditsViewModelFactory
+import com.example.movies.auth.ui.AuthScreen
+import com.example.movies.auth.ui.MoviesAuthViewModel
+import com.example.movies.auth.ui.MoviesAuthViewModelFactory
 import com.example.movies.nowplaying.ui.NowPlayingMoviesList
 import com.example.movies.nowplaying.ui.NowPlayingViewModel
 import com.example.movies.nowplaying.ui.NowPlayingViewModelFactory
@@ -52,6 +56,7 @@ import com.example.movies.toprated.ui.TopRatedViewModel
 import com.example.movies.toprated.ui.TopRatedViewModelFactory
 import com.example.movies_details.navigation.ACTOR_ID_ARG
 import com.example.movies_details.navigation.ACTOR_MOVIE_CREDITS_ROUTE
+import com.example.movies_details.navigation.AUTH_ROUTE
 import com.example.movies_details.navigation.MOVIE_DETAILS_ROUTE
 import com.example.movies_details.navigation.MOVIE_ID_ARG
 import com.example.movies_details.navigation.MOVIE_TITLE_ARG
@@ -73,6 +78,7 @@ import com.example.movies_rating.ui.MoviesRatingViewModelFactory
 import com.example.movies_upcoming.ui.UpcomingMoviesList
 import com.example.movies_upcoming.ui.UpcomingViewModel
 import com.example.movies_upcoming.ui.UpcomingViewModelFactory
+import com.example.state.State
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -93,6 +99,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var moviesRatingViewModelFactory: MoviesRatingViewModelFactory
+
+    @Inject
+    lateinit var moviesAuthViewModelFactory: MoviesAuthViewModelFactory
 
     @Inject
     lateinit var actorMovieCreditsViewModelFactory: ActorMovieCreditsViewModelFactory
@@ -160,9 +169,30 @@ class MainActivity : ComponentActivity() {
                     ) { innerPadding ->
                         NavHost(
                             navController = navController,
-                            startDestination = BottomNavItem.NowPlaying.route,
+                            startDestination = AUTH_ROUTE,
                             modifier = Modifier.padding(innerPadding)
                         ) {
+
+                            composable(AUTH_ROUTE) { backStackEntry ->
+                                val viewModel: MoviesAuthViewModel = viewModel(
+                                    factory = moviesAuthViewModelFactory, // через @Inject
+                                    viewModelStoreOwner = backStackEntry
+                                )
+
+                                // Ловим deep link
+                                LaunchedEffect(Unit) {
+                                    val data: Uri? = intent?.data
+                                    if (data?.host == "auth") {
+                                        val token = data.getQueryParameter("request_token")
+                                        if (!token.isNullOrEmpty()) {
+                                            viewModel.finishAuth(token)
+                                        }
+                                    }
+                                }
+                                AuthScreen(factory = moviesAuthViewModelFactory,navController = navController)
+
+                            }
+
                             // Bottom Nav Items
                             composable(NOW_PLAYING_ROUTE) {
                                 saveableStateHolder.SaveableStateProvider(NOW_PLAYING_ROUTE) {

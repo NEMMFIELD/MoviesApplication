@@ -3,6 +3,8 @@ package com.example.moviesapplication
 import android.app.Application
 import com.example.movies.actorfilms.di.ActorMovieCreditsComponent
 import com.example.movies.actorfilms.di.ActorMovieCreditsComponentProvider
+import com.example.movies.auth.di.MoviesAuthComponent
+import com.example.movies.auth.di.MoviesAuthComponentProvider
 import com.example.movies.nowplaying.di.NowPlayingComponent
 import com.example.movies.nowplaying.di.NowPlayingComponentProvider
 import com.example.movies.toprated.di.TopRatedComponent
@@ -21,7 +23,7 @@ import javax.inject.Inject
 
 class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector,
     ActorMovieCreditsComponentProvider, PopularComponentProvider, TopRatedComponentProvider,
-    UpcomingComponentProvider, MoviesRatingComponentProvider {
+    UpcomingComponentProvider, MoviesRatingComponentProvider, MoviesAuthComponentProvider {
 
     lateinit var appComponent: AppComponent
 
@@ -62,6 +64,10 @@ class MyApp : Application(), NowPlayingComponentProvider, HasAndroidInjector,
 
     override fun provideMoviesRatingComponent(): MoviesRatingComponent {
         return appComponent.moviesRatingComponent().create()
+    }
+
+    override fun provideMoviesAuthComponent(): MoviesAuthComponent {
+        return appComponent.moviesAuthComponent().create()
     }
 
 
