@@ -8,6 +8,7 @@ import com.example.movies.api.model.MovieActorsResponse
 import com.example.movies.api.model.MovieDetailsResponse
 import com.example.movies.api.model.RatingRequest
 import com.example.movies.api.model.RatingResponse
+import com.example.movies.api.model.RatingStatus
 import com.example.movies.api.model.RequestTokenResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -77,4 +78,12 @@ interface MoviesApi {
     suspend fun getActorMoviesCredits(
         @Path("person_id") personId: Int,
     ): ActorMovieCreditsResponse
+
+    //Check if movies is rated
+    @GET("movie/{movie_id}/account_states")
+    suspend fun getRatingStatus(
+        @Path("movie_id") movieId: Int?,
+        @Query("session_id") sessionId: String?,
+    ): RatingStatus
+
 }

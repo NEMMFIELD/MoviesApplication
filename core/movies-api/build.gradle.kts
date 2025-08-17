@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -16,4 +17,5 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
+    implementation(libs.kotlinx.serialization.json)
 }

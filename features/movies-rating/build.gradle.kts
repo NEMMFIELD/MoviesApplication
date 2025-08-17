@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kapt)
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
 }
 
 android {
@@ -65,6 +66,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.compose.ratingbar)
     implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(project(":core:movies-api"))
     implementation(project(":core:core-di"))

@@ -54,6 +54,9 @@ fun MoviesRatingScreen(
     val uiState by viewModel.uiState.collectAsState()
     var rating by remember { mutableStateOf(5) } // int для IMDbRatingBar
 
+    LaunchedEffect(movieId) {
+        viewModel.loadRatingStatus(movieId)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -117,6 +120,18 @@ fun MoviesRatingScreen(
             when (uiState) {
                 is MoviesRatingUiState.Loading -> {
                     CircularProgressIndicator()
+                }
+
+                is MoviesRatingUiState.RatingStatusLoaded -> {
+                    val alreadyRated = (uiState as MoviesRatingUiState.RatingStatusLoaded).status
+                    if (alreadyRated) {
+                        Text(
+                            "You have already rated it!",
+                            color = Color.Green,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
                 }
 
                 is MoviesRatingUiState.MovieRated -> {

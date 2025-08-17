@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.example.movies.api.MoviesApi
 import com.example.movies.api.model.RatingRequest
 import com.example.movies.api.model.RatingResponse
+import com.example.movies.api.model.RatingStatus
 import com.example.movies_rating.domain.MoviesRatingRepository
 import javax.inject.Inject
 
@@ -21,6 +22,13 @@ class MoviesRatingRepositoryImpl @Inject constructor(
     }
 
     override fun getSessionId(): String? {
-        return sharedPreferences.getString("session_id",null)
+        return sharedPreferences.getString("session_id", null)
+    }
+
+    override suspend fun getRatingStatus(
+        sessionId: String?,
+        movieId: Int?
+    ): RatingStatus {
+        return moviesApi.getRatingStatus(movieId = movieId, sessionId = sessionId)
     }
 }

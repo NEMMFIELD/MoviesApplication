@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModelProvider
 import com.example.movies.api.MoviesApi
 import com.example.movies_rating.data.MoviesRatingRepositoryImpl
+import com.example.movies_rating.domain.GetRatingStatusUseCase
 import com.example.movies_rating.domain.GetSessionIdUseCase
 import com.example.movies_rating.domain.MoviesRatingRepository
 import com.example.movies_rating.domain.RateMoviesUseCase
@@ -20,10 +21,12 @@ class MoviesRatingModule {
     fun provideMoviesratingViewModelFactory(
         rateMovieUseCase: RateMoviesUseCase,
         getSessionIdUseCase: GetSessionIdUseCase,
+        getRatingStatusUseCase: GetRatingStatusUseCase,
     ): ViewModelProvider.Factory {
         return MoviesRatingViewModelFactory(
             rateMovieUseCase,
-            getSessionIdUseCase = getSessionIdUseCase
+            getSessionIdUseCase = getSessionIdUseCase,
+            getRatingStatusUseCase
         )
     }
 
