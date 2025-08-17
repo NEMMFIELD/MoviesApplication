@@ -19,4 +19,8 @@ class MoviesAuthRepositoryImpl @Inject constructor(private val moviesApi: Movies
         sharedPreferences.edit().putString("session_id",sessionId).apply()
     }
 
+    override fun getSessionId(): String? {
+        return sharedPreferences.getString("session_id",null)
+    }
+
 }

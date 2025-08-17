@@ -27,6 +27,14 @@ fun AuthScreen(factory: ViewModelProvider.Factory, navController: NavController)
     val sessionState = viewModel.sessionState
     val isLoading = viewModel.isLoading
 
+    if (sessionState is State.Success) {
+        LaunchedEffect(Unit) {
+            navController.navigate(NOW_PLAYING_ROUTE) {
+                popUpTo(AUTH_ROUTE) { inclusive = true }
+            }
+        }
+    }
+
     when {
         isLoading -> {
             Box(

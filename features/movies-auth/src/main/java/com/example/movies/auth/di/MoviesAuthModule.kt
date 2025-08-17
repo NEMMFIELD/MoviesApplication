@@ -8,6 +8,7 @@ import com.example.movies.api.MoviesApi
 import com.example.movies.auth.data.MoviesAuthRepositoryImpl
 import com.example.movies.auth.domain.CreateRequestTokenUseCase
 import com.example.movies.auth.domain.CreateSessionUseCase
+import com.example.movies.auth.domain.GetSessionIdUseCase
 import com.example.movies.auth.domain.MoviesAuthRepository
 import com.example.movies.auth.domain.SaveSessionIdUseCase
 import com.example.movies.auth.ui.MoviesAuthViewModelFactory
@@ -33,8 +34,14 @@ class MoviesAuthModule {
     fun provideMoviesAuthViewModelFactory(
         createRequestTokenUseCase: CreateRequestTokenUseCase,
         createSession: CreateSessionUseCase,
-        saveSessionId: SaveSessionIdUseCase
+        saveSessionId: SaveSessionIdUseCase,
+        getSessionIdUseCase: GetSessionIdUseCase
     ): ViewModelProvider.Factory {
-        return MoviesAuthViewModelFactory(createRequestTokenUseCase, createSession, saveSessionId)
+        return MoviesAuthViewModelFactory(
+            createRequestTokenUseCase,
+            createSession,
+            saveSessionId,
+            getSessionIdUseCase
+        )
     }
 }

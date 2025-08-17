@@ -1,5 +1,6 @@
 package com.example.movies.api.model
 
+// Для авторизации
 data class RequestTokenResponse(
     val success: Boolean,
     val expires_at: String,
@@ -15,6 +16,7 @@ data class CreateSessionResponse(
     val session_id: String
 )
 
+// Для рейтинга
 data class RatingRequest(
     val value: Double
 )

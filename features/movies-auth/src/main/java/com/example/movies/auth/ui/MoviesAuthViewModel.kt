@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.movies.auth.domain.CreateRequestTokenUseCase
 import com.example.movies.auth.domain.CreateSessionUseCase
+import com.example.movies.auth.domain.GetSessionIdUseCase
 import com.example.movies.auth.domain.SaveSessionIdUseCase
 import com.example.state.State
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class MoviesAuthViewModel @Inject constructor(
     private val createRequestToken: CreateRequestTokenUseCase,
     private val createSession: CreateSessionUseCase,
-    private val saveSessionId: SaveSessionIdUseCase
+    private val saveSessionId: SaveSessionIdUseCase,
+    private val getSessionIdUseCase: GetSessionIdUseCase
 ) : ViewModel() {
     var tokenState by mutableStateOf<com.example.state.State<String>>(com.example.state.State.Empty)
         private set
@@ -27,6 +29,14 @@ class MoviesAuthViewModel @Inject constructor(
     var isLoading by mutableStateOf(false)
         private set
 
+    init {
+        viewModelScope.launch {
+            val savedSessionId = getSessionIdUseCase.execute()
+            if (savedSessionId != null) {
+                sessionState = State.Success(savedSessionId)
+            }
+        }
+    }
     fun startAuth() {
         viewModelScope.launch {
             isLoading = true
@@ -62,13 +72,14 @@ class MoviesAuthViewModel @Inject constructor(
 class MoviesAuthViewModelFactory @Inject constructor(
     private val createRequestToken: CreateRequestTokenUseCase,
     private val createSession: CreateSessionUseCase,
-    private val saveSessionId: SaveSessionIdUseCase
+    private val saveSessionId: SaveSessionIdUseCase,
+    private val getSessionIdUseCase: GetSessionIdUseCase
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MoviesAuthViewModel::class.java)) {
-            return MoviesAuthViewModel(createRequestToken, createSession, saveSessionId) as T
+            return MoviesAuthViewModel(createRequestToken, createSession, saveSessionId,getSessionIdUseCase) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
