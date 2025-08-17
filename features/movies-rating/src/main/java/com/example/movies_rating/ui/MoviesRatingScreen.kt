@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,8 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.movies_details.navigation.NOW_PLAYING_ROUTE
+import com.example.movies_details.navigation.RATING_ROUTE
 import com.example.movies_rating.R
 import com.example.movies_rating.data.MoviesRatingUiState
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,15 +119,26 @@ fun MoviesRatingScreen(
                     CircularProgressIndicator()
                 }
 
-                is MoviesRatingUiState.MovieRated -> Text(
-                    "Rating is sent! Thanks.",
-                    color = Color.Green,
-                    fontWeight = FontWeight.Bold
-                )
+                is MoviesRatingUiState.MovieRated -> {
+                    Text(
+                        "Rating is sent! Thanks.",
+                        color = Color.Green,
+                        fontWeight = FontWeight.Bold
+                    )
+                    LaunchedEffect(Unit)
+                    {
+                        delay(1500)
+                        navController.navigate(NOW_PLAYING_ROUTE) {
+                            popUpTo(RATING_ROUTE) { inclusive = true }
+                        }
+                    }
+                }
+
                 is MoviesRatingUiState.Error -> Text(
                     "Error: ${parseErrorMessage((uiState as MoviesRatingUiState.Error).throwable)}",
                     color = Color.Red
                 )
+
                 else -> Unit
             }
         }
@@ -151,6 +166,7 @@ fun IMDbRatingBar(
         }
     }
 }
+
 private fun parseErrorMessage(e: Throwable): String {
     return when (e) {
         is java.net.UnknownHostException -> "No internet connection."

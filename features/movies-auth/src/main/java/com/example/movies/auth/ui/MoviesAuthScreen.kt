@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
 import com.example.movies_details.navigation.AUTH_ROUTE
 import com.example.movies_details.navigation.NOW_PLAYING_ROUTE
@@ -29,7 +28,14 @@ fun AuthScreen(factory: ViewModelProvider.Factory, navController: NavController)
     val isLoading = viewModel.isLoading
 
     when {
-        isLoading -> CircularProgressIndicator()
+        isLoading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
 
         tokenState is State.Empty && sessionState is State.Empty -> {
             Box(
@@ -53,11 +59,22 @@ fun AuthScreen(factory: ViewModelProvider.Factory, navController: NavController)
                 View(context) // пустая заглушка
             })
 
-            Text("Подтвердите вход в браузере")
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Confirm login in browser")
+            }
+
         }
 
         sessionState is State.Success -> {
-            Text("Авторизация успешна! Session ID: ${sessionState.data}")
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = (Alignment.Center)
+            ) {
+                Text("Authorization successful! Session ID: ${sessionState.data}")
+            }
 
             // 👇 сразу навигируем дальше
             LaunchedEffect(sessionState) {
@@ -68,11 +85,11 @@ fun AuthScreen(factory: ViewModelProvider.Factory, navController: NavController)
         }
 
         tokenState is State.Failure -> {
-            Text("Ошибка при получении токена: ${tokenState.message.message}")
+            Text("Error getting token: ${tokenState.message.message}")
         }
 
         sessionState is State.Failure -> {
-            Text("Ошибка при получении сессии: ${sessionState.message.message}")
+            Text("Error getting session: ${sessionState.message.message}")
         }
     }
 }
