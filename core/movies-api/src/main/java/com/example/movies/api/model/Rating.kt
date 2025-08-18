@@ -46,7 +46,7 @@ data class RatingResponse(
 )
 
 @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
-@kotlinx.serialization.Serializable
+@Serializable
 data class RatingStatus(
     val id: Int,
     val favorite: Boolean,

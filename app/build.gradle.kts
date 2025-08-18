@@ -61,6 +61,7 @@ dependencies {
     kapt(libs.dagger.compiler)
     implementation(libs.dagger.android)
     implementation(libs.dagger.android.support)
+    implementation(libs.androidx.material.icons.extended)
     kapt(libs.dagger.android.processor)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

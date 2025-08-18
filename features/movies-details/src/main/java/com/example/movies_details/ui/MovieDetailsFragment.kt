@@ -50,6 +50,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.example.core.navigation.Screen
 import com.example.movies_details.data.MovieActorsModel
 import com.example.movies_details.data.MovieDetailsModel
 import com.example.movies_details.navigation.actorMovieCreditsRoute
@@ -146,18 +147,10 @@ fun MovieTitleWithRateButton(movie: MovieDetailsModel, navController: NavControl
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Текст занимает всё оставшееся место
-        Text(
-            text = movie.title ?: "Unknown Title",
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
 
         // Кнопка с увеличенной звездочкой
         IconButton(
-            onClick = { navController.navigate(rateMovieRoute(movie.id ?: 0, movie.title ?: "null")) },
+            onClick = {  navController.navigate(Screen.Rating.createRoute(movie.id ?: 0, movie.title ?: "null")) },
             modifier = Modifier
                 .size(50.dp) // чуть больше кнопка
                 .background(
@@ -172,6 +165,17 @@ fun MovieTitleWithRateButton(movie: MovieDetailsModel, navController: NavControl
                 modifier = Modifier.size(24.dp) // увеличенная звезда
             )
         }
+
+        Spacer(modifier = Modifier.width(30.dp))
+
+        // Текст занимает всё оставшееся место
+        Text(
+            text = movie.title ?: "Unknown Title",
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 

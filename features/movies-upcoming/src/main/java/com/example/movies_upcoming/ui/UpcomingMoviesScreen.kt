@@ -55,8 +55,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.core.navigation.Screen
 import com.example.core_model.MovieModel
-import com.example.movies_details.navigation.movieDetailsRoute
 import com.example.state.State
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -117,7 +117,8 @@ fun UpcomingMoviesList(upcomingViewModel: UpcomingViewModel, navController: NavC
                 movies = sortedUpcomingList,
                 isLoading = isLoading,
                 onMovieClick = { movieId ->
-                    navController.navigate(movieDetailsRoute(movieId)) },
+                    navController.navigate(Screen.MovieDetails.createRoute(movieId))
+                },
                 gridState = gridState,
                 animateItems = upcomingViewModel.isFirstLoad
             )

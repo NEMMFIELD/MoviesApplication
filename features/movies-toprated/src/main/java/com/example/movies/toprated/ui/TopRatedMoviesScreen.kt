@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.core.navigation.Screen
 import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
 import com.example.state.State
@@ -116,7 +117,7 @@ fun TopRatedMoviesList(topRatedViewModel: TopRatedViewModel, navController: NavC
                 movies = currentState.data.orEmpty(),
                 isLoading = isLoading,
                 onMovieClick = { movieId ->
-                    navController.navigate(movieDetailsRoute(movieId)) },
+                    navController.navigate(Screen.MovieDetails.createRoute(movieId)) },
                 gridState = gridState,
                 animateItems = topRatedViewModel.isFirstLoad
 
