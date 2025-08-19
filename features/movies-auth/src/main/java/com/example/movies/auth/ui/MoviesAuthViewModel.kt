@@ -40,12 +40,12 @@ class MoviesAuthViewModel @Inject constructor(
     fun startAuth() {
         viewModelScope.launch {
             isLoading = true
-            tokenState = com.example.state.State.Empty
+            tokenState = State.Empty
             try {
                 val token = createRequestToken.execute()
-                tokenState = com.example.state.State.Success(token)
+                tokenState = State.Success(token)
             } catch (e: Exception) {
-                tokenState = com.example.state.State.Failure(e)
+                tokenState = State.Failure(e)
             } finally {
                 isLoading = false
             }
@@ -55,13 +55,13 @@ class MoviesAuthViewModel @Inject constructor(
     fun finishAuth(token: String) {
         viewModelScope.launch {
             isLoading = true
-            sessionState = com.example.state.State.Empty
+            sessionState = State.Empty
             try {
                 val sessionId = createSession.execute(token)
                 saveSessionId.execute(sessionId)
-                sessionState = com.example.state.State.Success(sessionId)
+                sessionState = State.Success(sessionId)
             } catch (e: Exception) {
-                sessionState = com.example.state.State.Failure(e)
+                sessionState = State.Failure(e)
             } finally {
                 isLoading = false
             }

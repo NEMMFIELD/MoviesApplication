@@ -66,6 +66,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //leak canary
+    debugImplementation(libs.leak.canary)
+
     implementation(project(":core:movies-api"))
     implementation(project(":features:movies-nowplaying"))
     implementation(project(":features:movies-details"))

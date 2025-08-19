@@ -5,6 +5,7 @@ import com.example.movies.api.MoviesApi
 import com.example.movies.api.model.CreateSessionRequest
 import com.example.movies.auth.domain.MoviesAuthRepository
 import javax.inject.Inject
+import androidx.core.content.edit
 
 class MoviesAuthRepositoryImpl @Inject constructor(private val moviesApi: MoviesApi, private val sharedPreferences: SharedPreferences): MoviesAuthRepository {
     override suspend fun createRequestToken(): String {
@@ -16,7 +17,7 @@ class MoviesAuthRepositoryImpl @Inject constructor(private val moviesApi: Movies
     }
 
     override suspend fun saveSessionId(sessionId: String) {
-        sharedPreferences.edit().putString("session_id",sessionId).apply()
+        sharedPreferences.edit { putString("session_id", sessionId) }
     }
 
     override fun getSessionId(): String? {
