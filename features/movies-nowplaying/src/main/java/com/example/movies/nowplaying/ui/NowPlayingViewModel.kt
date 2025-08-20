@@ -46,7 +46,7 @@ class NowPlayingViewModel @Inject constructor(
         private set
 
     init {
-        Log.d("ViewModelCheck", "NowPlayingViewModel created: $this")
+       // Log.d("ViewModelCheck", "NowPlayingViewModel created: $this")
         loadNowPlayingMovies()
     }
 
