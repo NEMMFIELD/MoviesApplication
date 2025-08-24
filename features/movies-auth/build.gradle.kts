@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.browser)
-    testImplementation(libs.junit)
+
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.activity.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
@@ -62,8 +62,19 @@ dependencies {
     implementation(libs.dagger.android.support)
     kapt(libs.dagger.android.processor)
 
+    //tests
+    testImplementation (libs.mockk)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(kotlin("test"))
+    testImplementation (libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
+
     implementation(project(":core:movies-api"))
     implementation(project(":core:core-di"))
     implementation(project(":core:core-navigation"))
     implementation(project(":core:state"))
+    implementation(kotlin("test"))
 }
