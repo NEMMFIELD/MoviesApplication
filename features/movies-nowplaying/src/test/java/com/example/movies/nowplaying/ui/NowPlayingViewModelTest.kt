@@ -1,6 +1,7 @@
 package com.example.movies.nowplaying.ui
 
 import com.example.core_model.MovieModel
+import com.example.core_ui.State
 import com.example.movies.nowplaying.domain.NowPlayingMoviesUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -48,8 +49,8 @@ class NowPlayingViewModelTest {
 
         advanceUntilIdle() // ждем завершения launch
 
-        assert(viewModel.nowPlayingMoviesValue.value is com.example.state.State.Success)
-        val success = viewModel.nowPlayingMoviesValue.value as com.example.state.State.Success
+        assert(viewModel.nowPlayingMoviesValue.value is State.Success)
+        val success = viewModel.nowPlayingMoviesValue.value as State.Success
         assertEquals(testMovies, success.data)
 
         assertEquals(2, viewModel.currentPage)
@@ -65,7 +66,7 @@ class NowPlayingViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.isLastPage)
-        assertEquals(com.example.state.State.Empty, viewModel.nowPlayingMoviesValue.value)
+        assertEquals(State.Empty, viewModel.nowPlayingMoviesValue.value)
     }
 
     @Test
@@ -76,8 +77,8 @@ class NowPlayingViewModelTest {
         viewModel = NowPlayingViewModel(useCase)
         advanceUntilIdle()
 
-        assert(viewModel.nowPlayingMoviesValue.value is com.example.state.State.Failure)
-        val failure = viewModel.nowPlayingMoviesValue.value as com.example.state.State.Failure
+        assert(viewModel.nowPlayingMoviesValue.value is State.Failure)
+        val failure = viewModel.nowPlayingMoviesValue.value as State.Failure
         assertEquals(exception, failure.message)
     }
 

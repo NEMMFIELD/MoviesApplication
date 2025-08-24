@@ -11,7 +11,7 @@ import com.example.movies_details.data.MovieActorsModel
 import com.example.movies_details.data.MovieDetailsModel
 import com.example.movies_details.domain.GetMovieActorsUseCase
 import com.example.movies_details.domain.GetMovieDetailsUseCase
-import com.example.state.State
+import com.example.core_ui.State
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -53,7 +53,7 @@ class MovieDetailsViewModel @AssistedInject constructor(
 
     fun loadMovieDetails(movieId: Int?) {
         viewModelScope.launch(coroutineExceptionHandler) {
-            Log.d("MovieID", movieId.toString())
+           // Log.d("MovieID", movieId.toString())
             movieDetailsUseCase.execute(movieId = movieId ?: 0).collect { movieDetailsInfo ->
                 _movieDetailsValue.update { State.Success(movieDetailsInfo) }
             }

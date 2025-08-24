@@ -13,7 +13,7 @@ class GetMovieDetailsUseCase @Inject constructor(private val movieDetailsReposit
     fun execute(movieId: Int): Flow<MovieDetailsModel> = flow {
         val movieDetailsResponse = movieDetailsRepository.getMovieDetails(movieId)
         val movieDetails = MovieDetailsMapper.mapDtoToModel(movieDetailsResponse)
-        Log.d("movieDetails", movieDetailsResponse.backdropPath.toString())
+       // Log.d("movieDetails", movieDetailsResponse.backdropPath.toString())
         emit(movieDetails)
     }.flowOn(Dispatchers.IO)
 }

@@ -1,13 +1,12 @@
 package com.example.movies.nowplaying.ui
 
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.core_model.MovieModel
 import com.example.movies.nowplaying.domain.NowPlayingMoviesUseCase
-import com.example.state.State
+import com.example.core_ui.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

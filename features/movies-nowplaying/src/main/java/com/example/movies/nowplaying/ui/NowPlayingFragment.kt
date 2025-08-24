@@ -62,7 +62,7 @@ import coil3.compose.AsyncImage
 import com.example.core.navigation.Screen
 import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
-import com.example.state.State
+import com.example.core_ui.State
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged

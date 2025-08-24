@@ -1,7 +1,8 @@
-package com.example.moviesapplication
+package com.example.moviesapplication.di
 
 import com.example.movies.nowplaying.di.NowPlayingModule
 import com.example.movies_details.di.MovieDetailsPresentationModule
+import com.example.moviesapplication.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

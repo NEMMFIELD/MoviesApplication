@@ -60,7 +60,7 @@ import coil3.compose.AsyncImage
 import com.example.core.navigation.Screen
 import com.example.core_model.MovieModel
 import com.example.movies_details.navigation.movieDetailsRoute
-import com.example.state.State
+import com.example.core_ui.State
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -112,7 +112,7 @@ fun TopRatedMoviesList(topRatedViewModel: TopRatedViewModel, navController: NavC
     }
 
     when (val currentState = state) {
-        is com.example.state.State.Success -> {
+        is State.Success -> {
             TopRatedGrid(
                 movies = currentState.data.orEmpty(),
                 isLoading = isLoading,
@@ -124,13 +124,13 @@ fun TopRatedMoviesList(topRatedViewModel: TopRatedViewModel, navController: NavC
             )
         }
 
-        is com.example.state.State.Failure -> {
+        is State.Failure -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Error: ${currentState.message.message ?: "Unknown error"}", color = Color.Red)
             }
         }
 
-        com.example.state.State.Empty, null -> {
+        State.Empty, null -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),

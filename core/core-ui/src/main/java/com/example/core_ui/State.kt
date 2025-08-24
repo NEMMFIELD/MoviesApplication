@@ -1,4 +1,4 @@
-package com.example.state
+package com.example.core_ui
 
 sealed class State<out T> {
     data object Empty : State<Nothing>()
@@ -11,6 +11,5 @@ sealed class State<out T> {
             return data.hashCode()
         }
     }
-
     data class Failure<out T>(val message: Throwable) : State<T>()
 }

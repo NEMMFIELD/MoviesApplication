@@ -2,7 +2,7 @@ package com.example.movies_popular.ui
 
 import com.example.core_model.MovieModel
 import com.example.movies_popular.domain.GetPopularMoviesUseCase
-import com.example.state.State
+import com.example.core_ui.State
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers

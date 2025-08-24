@@ -25,7 +25,6 @@ rootProject.name = "Movies Application"
 include(":app")
 include(":core:movies-api")
 include(":features:movies-nowplaying")
-include(":core:state")
 include(":core:core-di")
 include(":features:movies-details")
 include(":core:core-ui")

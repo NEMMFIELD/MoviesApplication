@@ -16,9 +16,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.core_ui.State
 import com.example.movies_details.navigation.AUTH_ROUTE
 import com.example.movies_details.navigation.NOW_PLAYING_ROUTE
-import com.example.state.State
 
 @Composable
 fun AuthScreen(factory: ViewModelProvider.Factory, navController: NavController) {

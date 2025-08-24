@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.movies.actorfilms.data.ActorMovieCreditsModel
 import com.example.movies.actorfilms.domain.GetActorMovieCreditsUseCase
-import com.example.state.State
+import com.example.core_ui.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

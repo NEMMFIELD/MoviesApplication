@@ -1,4 +1,4 @@
-package com.example.moviesapplication
+package com.example.moviesapplication.di
 
 import android.app.Application
 import com.example.movies.actorfilms.di.ActorMovieCreditsComponent

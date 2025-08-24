@@ -55,7 +55,7 @@ import com.example.movies_details.data.MovieActorsModel
 import com.example.movies_details.data.MovieDetailsModel
 import com.example.movies_details.navigation.actorMovieCreditsRoute
 import com.example.movies_details.navigation.rateMovieRoute
-import com.example.state.State
+import com.example.core_ui.State
 import com.google.accompanist.flowlayout.FlowRow
 import kotlin.math.floor
 

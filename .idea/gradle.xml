@@ -6,7 +6,7 @@
       <GradleProjectSettings>
         <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+        <option name="gradleJvm" value="ms-21" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -17,7 +17,6 @@
             <option value="$PROJECT_DIR$/core/core-navigation" />
             <option value="$PROJECT_DIR$/core/core-ui" />
             <option value="$PROJECT_DIR$/core/movies-api" />
-            <option value="$PROJECT_DIR$/core/state" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/movies-actorfilms" />
             <option value="$PROJECT_DIR$/features/movies-auth" />
@@ -29,6 +28,7 @@
             <option value="$PROJECT_DIR$/features/movies-upcoming" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="true" />
       </GradleProjectSettings>
     </option>
   </component>

@@ -57,7 +57,7 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.core.navigation.Screen
 import com.example.core_model.MovieModel
-import com.example.state.State
+import com.example.core_ui.State
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import java.time.LocalDate

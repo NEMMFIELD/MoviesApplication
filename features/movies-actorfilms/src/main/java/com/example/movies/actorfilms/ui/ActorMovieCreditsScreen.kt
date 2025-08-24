@@ -29,7 +29,7 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.movies.actorfilms.data.ActorMovieCreditsModel
 import com.example.movies_details.navigation.movieDetailsRoute
-import com.example.state.State
+import com.example.core_ui.State
 
 @Composable
 fun ActorMovieCreditsScreen(

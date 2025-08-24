@@ -62,9 +62,18 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil3.coil.network.okhttp)
     implementation(libs.androidx.material.icons.extended)
+
+    //tests
+    testImplementation (libs.mockk)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(kotlin("test"))
+    testImplementation (libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
+
     implementation(project(":core:movies-api"))
-    implementation(project(":core:state"))
     implementation(project(":core:core-di"))
     implementation(project(":core:core-ui"))
     implementation(project(":core:core-navigation"))

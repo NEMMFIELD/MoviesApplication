@@ -74,11 +74,10 @@ dependencies {
     testImplementation(libs.junit)
 
     implementation(project(":core:movies-api"))
-    implementation(project(":core:state"))
     implementation(project(":core:core-di"))
     implementation(project(":core:core-ui"))
     implementation(project(":core:core-navigation"))
     implementation(project(":core:core-model"))
     implementation(project(":features:movies-details"))
-    implementation(kotlin("test"))
+
 }

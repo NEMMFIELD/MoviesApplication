@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.core_model.MovieModel
 import com.example.movies_upcoming.domain.GetUpcomingMoviesUseCase
-import com.example.state.State
+import com.example.core_ui.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class UpcomingViewModel @Inject constructor(private val getUpcomingMoviesUseCase: GetUpcomingMoviesUseCase) :
     ViewModel() {
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _upcomingMoviesValue.update { com.example.state.State.Failure(throwable) }
+        _upcomingMoviesValue.update { State.Failure(throwable) }
         _isLoading.value = false
     }
 

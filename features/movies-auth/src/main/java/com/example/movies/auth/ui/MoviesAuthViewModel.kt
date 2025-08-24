@@ -6,11 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.core_ui.State
 import com.example.movies.auth.domain.CreateRequestTokenUseCase
 import com.example.movies.auth.domain.CreateSessionUseCase
 import com.example.movies.auth.domain.GetSessionIdUseCase
 import com.example.movies.auth.domain.SaveSessionIdUseCase
-import com.example.state.State
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,10 +20,10 @@ class MoviesAuthViewModel @Inject constructor(
     private val saveSessionId: SaveSessionIdUseCase,
     private val getSessionIdUseCase: GetSessionIdUseCase
 ) : ViewModel() {
-    var tokenState by mutableStateOf<com.example.state.State<String>>(com.example.state.State.Empty)
+    var tokenState by mutableStateOf<State<String>>(State.Empty)
         private set
 
-    var sessionState by mutableStateOf<com.example.state.State<String>>(State.Empty)
+    var sessionState by mutableStateOf<State<String>>(State.Empty)
         private set
 
     var isLoading by mutableStateOf(false)
