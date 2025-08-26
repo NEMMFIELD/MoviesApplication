@@ -49,14 +49,14 @@ class ActorMovieCreditsViewModelTest {
 
         // when
         viewModel.actorMovieCreditsValue.test {
-            assertTrue(awaitItem() is com.example.core_ui.State.Empty) // начальное состояние
+            assertTrue(awaitItem() is State.Empty) // начальное состояние
 
             viewModel.loadActorMovieCredits(actorId)
             testDispatcher.scheduler.advanceUntilIdle()
 
             val successState = awaitItem()
-            assertTrue(successState is com.example.core_ui.State.Success)
-            assertTrue((successState as com.example.core_ui.State.Success).data == models)
+            assertTrue(successState is State.Success)
+            assertTrue((successState as State.Success).data == models)
         }
     }
 

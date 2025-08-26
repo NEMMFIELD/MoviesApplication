@@ -2,7 +2,6 @@ package com.example.movies_rating.data
 
 
 import com.example.movies.api.model.RatingResponse
-import com.example.movies.api.model.RatingStatus
 
 
 sealed class MoviesRatingUiState {
